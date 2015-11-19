@@ -1,0 +1,46 @@
+<h1 id="auto-completion">Auto completion</h1>
+<ul>
+<li>A key feature of 3P is the built in auto completion window. Fully integrated with notepad++, it smoothes the developper work by suggesting the best match according to his intention :</li>
+</ul>
+<p><img src="https://cloud.githubusercontent.com/assets/11553075/11215781/419a86a4-8d48-11e5-9155-c062659551dd.png" alt="image"></p>
+<ul>
+<li>The embedded dictionnary of ABL keywords contains more than 2800 words which should cover your entire needs (you can even add new words if some are missings) :</li>
+</ul>
+<p><img src="https://cloud.githubusercontent.com/assets/11553075/11216157/136dc9d8-8d4a-11e5-9775-2abdc5b77d33.png" alt="image"></p>
+<ul>
+<li><p>The more you use a keyword, the higher it will appear in the list</p>
+</li>
+<li><p>The list doesn&#39;t exclusively include <em>static</em> words ; a built in ABL parser analyses the code on the fly and pushes words like : variables, procedures, functions, temp-tables and so on, into the autocompletion list. Moreover, if a program contains an include call <code>{myinclude.i}</code> it will also analyse the included file.</p>
+</li>
+<li><p>It only displays elements that are relevant at the cursor position. For instance, a variable defined in a local procedure will not show up in another procedure ; or a variable will not show up in a line where it is not yet known by the compiler :</p>
+</li>
+</ul>
+<p><img src="https://cloud.githubusercontent.com/assets/11553075/11218038/8c49e586-8d53-11e5-884e-736cac8892a7.png" alt="image"></p>
+<ul>
+<li>it sorts the keywords into categories (more than 15) to easily find your keyword. You can activate/deactivate a category with a simple click :</li>
+</ul>
+<p><img src="https://cloud.githubusercontent.com/assets/11553075/11217991/5ca40abe-8d53-11e5-99ec-66ea7a06187d.png" alt="image"></p>
+<ul>
+<li>if you configure a connection to a progress database, it provides the autocompletion on <code>TABLE</code> names as well as <code>FIELD</code> names. Enter <code>mydatabasename</code> followed by a dot <code>.</code> and a list of tables of this database will show up, a dot <code>.</code> after a table name will show up its fields (it also differentiates fields that are part of the primary key) :</li>
+</ul>
+<p><img src="https://cloud.githubusercontent.com/assets/11553075/11216639/85bdaccc-8d4c-11e5-9caa-6ff3a24d5b72.png" alt="image"></p>
+<blockquote>
+<p>This also works with buffers so... use them!</p>
+</blockquote>
+<ul>
+<li>A keyword can have one or several flags (and eventually a small text) that quickly provides extra information on said word. In the example below, <code>g_codeset</code> is a <code>SHARED</code> variable, defined in the <code>PROGRAM SCOPE</code> (i.e. available to all procedures and functions) and was found in an <code>INCLUDE</code> file:</li>
+</ul>
+<p><img src="https://cloud.githubusercontent.com/assets/11553075/11216736/208108f8-8d4d-11e5-944f-a2267c7c0c34.png" alt="image"></p>
+<ul>
+<li>When using the <code>UP</code> or <code>DOWN</code> arrow keys, you can navigate through the list. It also shows a tooltip next to the autocompletion that provides more information on the keyword selected, this tooltip can be used to understand the flags described in the above section!</li>
+</ul>
+<p><img src="https://cloud.githubusercontent.com/assets/11553075/11216436/70493fba-8d4b-11e5-9822-3089c62be2de.png" alt="image"></p>
+<ul>
+<li>Extra tips :<ul>
+<li>Thanks to the way keywords are sorted, you can find quick ways to type a word. For instance, the fastest way to type <code>ERROR-STATUS</code> can be typing <code>errsta</code> and pressing tab to accept the suggestion</li>
+<li>By holding the <code>ALT</code> key in addition to <code>LEFT</code> or <code>RIGHT</code> arrow key you can quickly filter the keywords by categories while keeping your two hands on the keyboard</li>
+<li>Through the option window, you can set a mode that automatically inserts the best match when you end a word (a space, a dot or any operator can end a word). This is the fastest way to write ABL code!</li>
+<li>A tons of other options are available, go check them out!</li>
+</ul>
+</li>
+</ul>
