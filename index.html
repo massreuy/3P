@@ -70,17 +70,17 @@
                 { 
                   count += data[i].assets[0].download_count; 
                 }
-                $('#download-nb-img').attr('src', 'https://img.shields.io/badge/total%20downloads-' + count + '-FFC400.svg?style=plastic');
+                $('#download-nb-img').attr('src', 'https://img.shields.io/badge/total%20downloads-' + count + '-FFC400.svg?style=social');
 
                 if (!data[stableReleaseNb].prerelease) {
-                  $('#version-img').attr('src', 'https://img.shields.io/badge/latest%20stable%20version-' + data[stableReleaseNb].tag_name + '-limegreen.svg?style=plastic');
+                  $('#version-img').attr('src', 'https://img.shields.io/badge/latest%20stable%20version-' + data[stableReleaseNb].tag_name + '-limegreen.svg?style=social');
                   $('#version-a').attr('href', data[stableReleaseNb].html_url);
                 } else {
                   stableReleaseNb = betaReleaseNb;
                 }
 
                 if (data[betaReleaseNb].prerelease) {
-                  $('#version-beta-img').attr('src', 'https://img.shields.io/badge/latest%20beta%20version-' + data[betaReleaseNb].tag_name + '-orangered.svg?style=plastic');
+                  $('#version-beta-img').attr('src', 'https://img.shields.io/badge/latest%20beta%20version-' + data[betaReleaseNb].tag_name + '-orangered.svg?style=social');
                   $('#version-beta-a').attr('href', data[betaReleaseNb].html_url);
                 }
 
@@ -133,34 +133,32 @@
 
         <aside id="sidebar">
 
+          <h2>Pages</h2>
+          <a href="pages/home.html">Home page</a><br>
+          <a href="pages/autocompletion.html">Auto completion</a><br>
+          <a href="pages/code_explorer.html">Code explorer</a><br>
+          <a href="pages/tooltips.html">Tooltips</a><br>
+
+          <h2>Info</h2>
+
           <a id="latest-download" class="button button2 doubleLine">
             <small>Click here to get the lastest version</small>
             .zip file
           </a>
-
-          <a href="https://www.microsoft.com/en-us/download/details.aspx?id=17851"><img src="https://img.shields.io/badge/requires-.net%20framework%204.0-C7023D.svg?style=plastic" alt="State"></a>
           <br>
-          <a href="http://www.gnu.org/licenses/gpl.txt" target="_blank"><img src="https://img.shields.io/badge/license-GPLv3-blue.svg?style=plastic" alt="License"></a>
+          <a href="https://www.microsoft.com/en-us/download/details.aspx?id=17851"><img src="https://img.shields.io/badge/requires-.net%20framework%204.0-C7023D.svg?style=social" alt="State"></a>
           <br>
-          <a id="version-a"><img id="version-img" src="https://img.shields.io/badge/latest%20stable%20version-unavailable-limegreen.svg?style=plastic" alt="Latest version"></a>
+          <a href="http://www.gnu.org/licenses/gpl.txt" target="_blank"><img src="https://img.shields.io/badge/license-GPLv3-blue.svg?style=social" alt="License"></a>
           <br>
-          <a id="version-beta-a"><img id="version-beta-img" src="https://img.shields.io/badge/latest%20beta%20version-unavailable-orangered.svg?style=plastic" alt="Latest version"></a>
+          <a id="version-a"><img id="version-img" src="https://img.shields.io/badge/latest%20stable%20version-unavailable-limegreen.svg?style=social" alt="Latest version"></a>
           <br>
-          <img id="download-nb-img" src="https://img.shields.io/badge/total%20downloads-0-FFC400.svg?style=plastic" alt="Number of downloads">
+          <a id="version-beta-a"><img id="version-beta-img" src="https://img.shields.io/badge/latest%20beta%20version-unavailable-orangered.svg?style=social" alt="Latest version"></a>
+          <br>
+          <img id="download-nb-img" src="https://img.shields.io/badge/total%20downloads-0-FFC400.svg?style=social" alt="Number of downloads">
           <br>
 
           <img src="images/3p-logo.png">
           <p class="repo-owner"><a href="https://github.com/jcaillon/3P"></a> is maintained by <a href="https://github.com/jcaillon">jcaillon</a>.</p>
-
-          <a href="https://github.com/jcaillon/3P/zipball/master" class="button">
-            <small>Download master branch</small>
-            .zip file
-          </a>
-
-          <a href="https://github.com/jcaillon/3P/tarball/master" class="button">
-            <small>Download master branch</small>
-            .tar.gz file
-          </a>
 
           <p>This page is based on the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
         </aside>
