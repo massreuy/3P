@@ -1,17 +1,17 @@
-# 3P: Progress Programmers Pal #
+# Home page #
 
 ***
 
 **BE WARNED** : As of today, this project is still a work in progress and a first release has not been created yet, this page is only a draft
 
-## Content ##
+## Content of this page ##
 
 + [About this project](#about-this-project)
-+ [Quick start](#quick-start)
-    - [Installation](#installation)
-    - [First use](#first-use)
-+ [3P's showcase](#3ps-showcase)
++ [Key features](#key-features)
 + [A final word](#a-final-word)
+
+
+
 
 ***
 
@@ -34,35 +34,7 @@ If you are not fond of the appbuilder and looking for a fast and efficient **ABL
 
 ***
 
-## Quick start ##
-
-### Installation ###
-
-There are two **very easy** ways of installing 3P :
-
-1. The first way is through the plugin manager, go to :
-    * `PLUGINS > PLUGIN MANAGER > SHOW PLUGIN MANAGER`
-    * Look for **3P** in the available plugins list and click on the checkbox
-    * Press install
-    * restart notepad++
-
-2. The second way is to install the plugin manually, which is also easy since it comes as a single .dll file
-    * Download the latest version of the file
-    * `SETTINGS > IMPORT > IMPORT PLUGIN(S)`
-    * Select the downloaded .dll file
-    * restart notepad++
-
-### First use ###
-
-Once you installed the plugin you will be asked to restart notepad++ once again to activate the syntax highlighting, then you are ready to use 3P.
-
-> wiki incoming...
-
-
-
-***
-
-## 3P's showcase  ##
+## Key features  ##
 
 This paragraph briefly presents the main features of 3P.
 
@@ -70,19 +42,19 @@ This paragraph briefly presents the main features of 3P.
 
 Ths plugin will display two new side panels (on left and right) as shown below :
 
-![image](https://cloud.githubusercontent.com/assets/11553075/11215041/8e342adc-8d44-11e5-9c3e-fef920076f46.png)
+![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/8e342adc-8d44-11e5-9c3e-fef920076f46.png)
 
 ### Syntax highlighting ###
 
-3P has an embedded syntax highligher, several themes are available and switchable on the fly :
+3P has an embedded syntax highligher, several themes are available and switchable at will :
 
-![image](https://cloud.githubusercontent.com/assets/11553075/11215274/a84d092e-8d45-11e5-87c6-830d40460e14.png)
+![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/a84d092e-8d45-11e5-87c6-830d40460e14.png)
 
-### Autocompletion ###
+### Auto-completion ###
 
-A key feature of 3P is the built in autocompletion window. Fully integrated with notepad++, it smoothes the developper work by suggesting the best match according to his intention :
+A key feature of 3P is the built in auto-completion window. Fully integrated with notepad++, it smoothes the developper work by suggesting the best match according to his intention :
 
-![image](https://cloud.githubusercontent.com/assets/11553075/11215781/419a86a4-8d48-11e5-9155-c062659551dd.png)
+![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/419a86a4-8d48-11e5-9155-c062659551dd.png)
 
 *[Learn more about this feature here](pages/autocompletion.html)*
 
@@ -90,7 +62,7 @@ A key feature of 3P is the built in autocompletion window. Fully integrated with
 
 Tooltips are another important part of 3P, they provide information on a word. You can activate them by simply hovering a word with your cursor :
 
-![image](https://cloud.githubusercontent.com/assets/11553075/11218206/3b6b3e8e-8d54-11e5-8162-297dcb0f4c5c.png)
+![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/3b6b3e8e-8d54-11e5-8162-297dcb0f4c5c.png)
 
 *[Learn more about this feature here](pages/tooltips.html)*
 
@@ -102,7 +74,7 @@ The code explorer is your best friend when it comes to... exploring the code.
 
 It acts as an improved `function list`, well known to the notepad++ users. It displays the structure of the program and provides a quick way to jump from a code's portion to another (left click an item to get redirected to it) :
 
-![image](https://cloud.githubusercontent.com/assets/11553075/11218752/256db7f8-8d57-11e5-9924-93fa3d87e83e.png)
+![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/256db7f8-8d57-11e5-9924-93fa3d87e83e.png)
 
 *[Learn more about this feature here](pages/code_explorer.html)*
 
