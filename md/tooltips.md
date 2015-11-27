@@ -10,4 +10,4 @@
 
 * Sometimes, several definitions are available for a word. For instance, the word `ASSIGN` is an ABL *statement*, but is also a *method*. You can loop through the various definitions by holding the `CTRL` key and pressing the `DOWN` arrow key (also works with `UP`)
 
-* In another case, you might want to keep the tooltip open when you move your mouse ; in order, for example, to click the `Go to definition` link of a procedure's tooltip. You might want to press the `CTRL` key to do just that
+* In another case, you might want to keep the tool-tip open when you move your mouse ; in order, for example, to click the `Go to definition` link of a procedure's tool-tip. You might want to press the `CTRL` key to do just that

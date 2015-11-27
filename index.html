@@ -4,6 +4,7 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description=" content="Progress Programmers Pal (3P), is a notepad++ plugin designed to help writing OpenEdge ABL / Progress 4GL code,  its use is governed by GPL License. 3P transforms notepad++ into an ABL code editor, providing : synthax checking, compilation, autocompletion, tooltips, and much more! If you are not fond of the appbuilder and looking for a fast and efficient ABL editor, look no further!">
     <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
@@ -14,36 +15,30 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <title>3P : Progress Programmers Pal, an OpenEdge ABL (formerly 4GL Progress) code editor running on
-        notepad++</title>
-
+    <title>3P : Progress Programmers Pal, an OpenEdge ABL (4GL Progress) code editor running on notepad++</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="javascript/jquery.ba-hashchange.min.js"></script>
+    <script src="javascript/marked.min.js"></script>
+    
     <script>
+        // Load the content of the pages/ into the #page-content div
         function loadtocontent(html) {
             scrolltoTop();
             $('#page-content').fadeOut(200, function () {
                 $('#loader').empty();
                 $('#loader').append("<img src='images/717.GIF'>");
-                $('#page-content').load(html, function () {
+                jQuery.get(html, function(data) {
+                    $('#page-content').empty();
+                    var htmlContent = marked(data);
                     $('#loader').empty();
+                    $('#page-content').append(htmlContent);
                     $('#page-content').fadeIn(300);
-                    modifyLinks();
                 });
             });
         }
 
-        function modifyLinks() {
-            $('a').on('click', function (e) {
-                var page = $(this).attr('href');
-                if (page.indexOf("pages/") > -1) {
-                    e.preventDefault();
-                    loadtocontent(page);
-                    return false;
-                }
-            });
-        }
-
+        // function to scroll to the top, animated
         function scrolltoTop() {
             if ($(window).scrollTop() > 200) {
                 $('body, html').animate({
@@ -53,8 +48,10 @@
         }
 
         $(document).ready(function () {
+            // get data from github API
             $.getJSON("https://api.github.com/repos/jcaillon/3p/releases").done(function (data) {
                 if (data.length > 0) {
+
                     var stableReleaseNb = 0;
                     while (stableReleaseNb <= data.length) {
                         if (!data[stableReleaseNb].prerelease) break;
@@ -85,37 +82,57 @@
                     }
 
                     $('#latest-download').attr('href', data[stableReleaseNb].assets[0].browser_download_url);
-                } else {
-                    $('#mongodb-download').text('Download link unavailable');
                 }
             });
 
-            var amountScrolled = 300;
-
+            // display/hide the back to top link
             $(window).scroll(function () {
-                if ($(window).scrollTop() > amountScrolled) {
+                if ($(window).scrollTop() > 300) {
                     $('a.back-to-top').fadeIn('slow');
                 } else {
                     $('a.back-to-top').fadeOut('slow');
                 }
             });
 
+            // Back to top link
             $('a.back-to-top').click(function () {
                 scrolltoTop();
                 return false;
             });
 
-            /* load default page function */
-            loadtocontent("pages/home.html");
+            // Bind an event to window.onhashchange that, when the hash changes triggers this
+            $(window).hashchange( function(){
+                var hash = location.hash;
+                hash = hash.replace( /^#/, '' );
+
+                if (hash.indexOf("/") == 0) {
+                    loadtocontent("md" + hash + ".md");  
+                } else if (location.hash.length == 0) {
+                    /* load default page function */
+                    loadtocontent("md/home.md");
+                }
+
+                // add the class 'selected' to the page link, linking to the current page
+                $('#pagelinks li a').each(function(){
+                    var that = $(this);
+                    that[ that.attr( 'href' ) === location.hash ? 'addClass' : 'removeClass' ]( 'selected' );
+                });
+
+            })
+
+            // Since the event is only triggered when the hash changes, we need to trigger
+            // the event now, to handle the hash the page may have loaded with.
+            $(window).hashchange();
 
         });
+
     </script>
 </head>
 
 <body>
 <header>
     <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
-    <a href="pages/home.html" class="back-in-time"><i class="fa fa-home"></i></a>
+    <a href="#/home" class="back-in-time"><i class="fa fa-home"></i></a>
 
     <div class="inner">
         <h1>3p</h1>
@@ -139,19 +156,25 @@
         <aside id="sidebar">
 
             <h2>Pages</h2>
-            <a href="pages/home.html">Home page</a><br>
-            <a href="pages/installation.html">Installation</a><br>
-            <a href="pages/autocompletion.html">Auto completion</a><br>
-            <a href="pages/code_explorer.html">Code explorer</a><br>
-            <a href="pages/tooltips.html">Tooltips</a><br>
+            <ul id="pagelinks">
+                <li><a href="#/home">Home page</a></li>
+                <li><a href="#/installation">Installation</a></li>
+                <li><a href="#/autocompletion">Auto completion</a></li>
+                <li><a href="#/code_explorer">Code explorer</a></li>
+                <li><a href="#/tooltips">Tooltips</a></li>
+            </ul>
 
-            <h2>Info</h2>
 
+            <br>
+            <h2>Download</h2>
             <a id="latest-download" class="button button2 doubleLine">
-                <small>Click here to get the lastest version</small>
+                <small>Download latest version</small>
                 .zip file
             </a>
             <br>
+
+            <br>
+            <h2>Info</h2>
             <a href="https://www.microsoft.com/en-us/download/details.aspx?id=17851"><img
                     src="https://img.shields.io/badge/requires-.net%20framework%204.0-C7023D.svg?style=social"
                     alt="State"></a>

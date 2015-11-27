@@ -529,7 +529,7 @@ a.button {
 }
 a.button small {
   display: block;
-  font-size: 11px;
+  font-size: 13px;
 }
 header a.button {
   position: absolute;
@@ -944,10 +944,20 @@ aside#sidebar h2 {
   font-weight: bold;
   color: #474747;
   text-indent: 4px;
+  margin-top: 5px;
 }
 aside#sidebar h2:before {
   padding-right: 0.3em;
   margin-left: 0em;
   content: "//";
   color: #9ddcff;
+}
+
+.selected {
+  font-weight: bold;
+  color: #000000;
+}
+
+#pagelinks {
+  color: #3277CB;
 }

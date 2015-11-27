@@ -8,6 +8,6 @@
 
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/5771f858-8d58-11e5-85f8-1b4e343da4b4.png)
 
-* You can also filter the items by typing a word in the textbox available for this end :
+* You can also filter the items by typing a word in the text-box available for this end :
 
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/8e34ca6e-8d58-11e5-9ffb-e954cb291fcc.png)
