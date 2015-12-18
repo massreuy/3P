@@ -54,15 +54,19 @@
                 if (data.length > 0) {
 
                     var stableReleaseNb = 0;
-                    while (stableReleaseNb <= data.length) {
+                    while (stableReleaseNb < data.length) {
                         if (!data[stableReleaseNb].prerelease) break;
                         stableReleaseNb++;
                     }
+                    if (stableReleaseNb > 0)
+                        stableReleaseNb = stableReleaseNb - 1;
                     var betaReleaseNb = 0;
-                    while (betaReleaseNb <= data.length) {
+                    while (betaReleaseNb < data.length) {
                         if (data[betaReleaseNb].prerelease) break;
                         betaReleaseNb++;
                     }
+                    if (betaReleaseNb > 0)
+                        betaReleaseNb = betaReleaseNb - 1;
 
                     var count = 0;
                     for (var i = 0, n = data.length; i < n; i++) {
