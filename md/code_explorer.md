@@ -1,5 +1,7 @@
 # The code explorer #
 
+*Last update of this page : 10/12/2015*
+
 * The code explorer acts as an improved `function list`, well known to the notepad++ users. It displays the structure of the program and provides a quick way to jump from a code's portion to another (left click an item to get redirected to it) :
 
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/256db7f8-8d57-11e5-9924-93fa3d87e83e.png)

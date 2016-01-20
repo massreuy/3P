@@ -1,5 +1,7 @@
 # Tooltips #
 
+*Last update of this page : 10/12/2015*
+
 * Tooltips are another important part of 3P, they quickly provide information on a word (as long as it is known by the software). You can activate them by simply hovering a word with your cursor :
 
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/3b6b3e8e-8d54-11e5-8162-297dcb0f4c5c.png)

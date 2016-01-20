@@ -1,5 +1,7 @@
 # Auto completion #
 
+*Last update of this page : 10/12/2015*
+
 * A key feature of 3P is the built in auto completion window. Fully integrated with notepad++, it smooths the developer work by suggesting the best match according to his intention :
 
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/419a86a4-8d48-11e5-9155-c062659551dd.png)

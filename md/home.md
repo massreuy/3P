@@ -1,8 +1,10 @@
 # Home page #
 
-***
+*Last update of this page : 20/01/2016*
 
-**BE WARNED** : As of today, this project is still a work in progress and a first release has not been created yet, this page is only a draft
+**BE WARNED** : As of today, this project is still a work in progress and has only been released as an alpha version
+
+***
 
 ## Content of this page ##
 
@@ -38,9 +40,9 @@ This paragraph briefly presents the main features of 3P.
 
 ### Overview ###
 
-This plug-in will display two new side panels (on left and right) as shown below :
+The screenshot below gives you a quick overview of 3P's features :
 
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/8e342adc-8d44-11e5-9c3e-fef920076f46.png)
+![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_overview.png)
 
 ### Syntax highlighting ###
 

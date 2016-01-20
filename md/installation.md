@@ -1,5 +1,8 @@
 # Installation #
 
+*Last update of this page : 10/12/2015*
+
+
 **3P** comes as a notepad++ plug-in, hence the first step is to download and install the latest version notepad++ at [notepad-plus-plus.org/download/](https://notepad-plus-plus.org/download/).
 
 Once notepad++ is installed, there are two **very easy** ways of installing 3P :
