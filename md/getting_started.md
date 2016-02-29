@@ -2,8 +2,6 @@
 
 *Last update of this page : 20/01/2016*
 
-**I'll keep this short.** The full documentation can be found [here](http://jcaillon.github.io/3P/).
-
 ***
 
 ## Main menu ##
@@ -18,7 +16,7 @@ All 3P's features are accessible from this menu, this is the main entry point. O
 
 ## Setting an environment ##
 
-3P has a lot of features that are available immediately, like the auto-completion or the syntax highlighting. **However,** if you want to enable the **FULL POTENTIAL** of this software, like : 
+3P has a lot of features that are available immediately, like the auto-completion or the syntax highlighting. **However,** if you want to enable the **FULL POTENTIAL** of this software, like :
 
 - auto-completing database tables/fields,
 - compiling, running your program from notepad++,
@@ -34,6 +32,10 @@ Read the info below concerning the page `SET` > `ENVIRONMENT` :
 
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/getting-started-1.png)
 
+---
+
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/getting-started-2.png)
+
+---
 
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/getting-started-3.png)

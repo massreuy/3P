@@ -21,7 +21,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="javascript/jquery.ba-hashchange.min.js"></script>
     <script src="javascript/marked.min.js"></script>
-    
+
     <script>
         // Load the content of the pages/ into the #page-content div
         function loadtocontent(html) {
@@ -111,7 +111,7 @@
                 hash = hash.replace( /^#/, '' );
 
                 if (hash.indexOf("/") == 0) {
-                    loadtocontent("md" + hash + ".md");  
+                    loadtocontent("md" + hash + ".md");
                 } else if (location.hash.length == 0) {
                     /* load default page function */
                     loadtocontent("md/home.md");
@@ -167,6 +167,7 @@
                 <li><a href="#/getting_started">Getting started</a></li>
                 <li><a href="#/autocompletion">Auto completion</a></li>
                 <li><a href="#/code_explorer">Code explorer</a></li>
+                <li><a href="#/file_explorer">File explorer</a></li>
                 <li><a href="#/tooltips">Tooltips</a></li>
             </ul>
 

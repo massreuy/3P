@@ -1,8 +1,6 @@
 # Home page #
 
-*Last update of this page : 20/01/2016*
-
-**BE WARNED** : As of today, this project is still a work in progress and has only been released as an alpha version
+*Last update of this page : 29/02/2016*
 
 ***
 
@@ -23,11 +21,13 @@ Progress Programmers Pal (3P), is a **[notepad++](https://notepad-plus-plus.org/
 
 3P transforms notepad++ into an ABL code editor, providing :
 
-* syntax checking
-* compilation
-* auto-completion
-* tool-tips
-* and much more!
+* a powerful auto-completion
+* tool-tips on every words
+* a code explorer to quickly navigate through your code
+* a file explorer to easily access all your sources
+* more than 50 options to better suit your needs
+* the ability to run/compile and even **[PROLINT](http://www.oehive.org/book/export/html/223)** your source file with an in-line visualization of errors
+* and so much more!
 
 If you are not fond of the appbuilder and looking for a fast and efficient **ABL editor**, look no further!
 
@@ -36,7 +36,7 @@ If you are not fond of the appbuilder and looking for a fast and efficient **ABL
 
 ## Key features  ##
 
-This paragraph briefly presents the main features of 3P.
+This paragraph briefly presents the main features of 3P (the list is not exhaustive).
 
 ### Overview ###
 
@@ -74,10 +74,36 @@ The code explorer is your best friend when it comes to... exploring the code.
 
 It acts as an improved `function list`, well known to the notepad++ users. It displays the structure of the program and provides a quick way to jump from a code's portion to another (left click an item to get redirected to it) :
 
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/256db7f8-8d57-11e5-9924-93fa3d87e83e.png)
+![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_codeexplorer.png)
 
 *[Learn more about this feature here](#/code_explorer)*
 
+### File explorer ###
+
+You can easily browse the files of your local directory and/or propath with the file explorer. A powerful search tool has been added to make sure you can quickly find the file you are looking for :
+
+![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_fileexplorer.png)
+
+*[Learn more about this feature here](#/file_explorer)*
+
+### Error visualization ###
+
+With 3P, you can visualize the compilation errors (or PROLINT errors in the screenshot below) directly into notepad++ :
+
+![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_errors.png)
+
+
+### Adaptability ###
+
+3P has tons of options to help you in your work and to better suit your project needs. Beside all the *classic* options that could be expected from a code editor, 3P also has *4GL progress* oriented options ; like the ability to define several environments, to choose the way prowin is launched, the way database are connected and so on... Below is one of the option page of the application :
+
+![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_setenv.png)
+
+### And more!? ###
+
+See what 3P can bring you by *[installing](#/installation)* it! It only takes a few seconds ;)
+
+You can also browse this website through the navigation menu on your right to check out more features of 3P.
 
 ***
 
@@ -86,3 +112,5 @@ It acts as an improved `function list`, well known to the notepad++ users. It di
 One thing the AppBuilder has that 3P doesn't, is the [graphical interface](https://documentation.progress.com/output/ua/OpenEdge_latest/index.html#page/gsstu/overview-of-the-openedge-appbuilder.html) to modify your .w files. You can do it by code, obviously, but i admit that it's not a simple task.
 
 Personally, i use 3P as a **complement** to the AppBuilder, designing interfaces with the graphical tool and switching to notepad++ to modify the core behavior.
+
+Also, at the moment (29/02/2016), 3P does not parse .cls files. But don't worry, this feature will come in a (near) future release.
