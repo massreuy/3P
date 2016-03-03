@@ -930,7 +930,7 @@ a.back-in-time {
 .nothing
 {
    border-collapse:collapse;
-} 
+}
 .nothing td
 {
    border:none;
@@ -960,4 +960,6 @@ aside#sidebar h2:before {
 
 #pagelinks {
   color: #3277CB;
+  font-size: 13px;
+  list-style-type: square;
 }

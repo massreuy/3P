@@ -12,7 +12,7 @@ Once notepad++ is installed, there are two **very easy** ways of installing 3P :
     * ~~Look for **3P** in the available list of plug-ins and click on the check box~~
     * ~~Press install~~
     * ~~restart notepad++~~
-    * **THIS METHOD ISN'T AVAILABLE YET**
+**THE METHOD ABOVE ISN'T AVAILABLE AT THE MOMENT**
 
 2. The second way is to install the plug-in manually, which is also easy since it comes as a single .dll file
     * Download the latest version of 3P (download button available on the menu on your right)
