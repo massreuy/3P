@@ -52,28 +52,14 @@
             // get data from github API
             $.getJSON("https://api.github.com/repos/jcaillon/3p/releases").done(function (data) {
                 if (data.length > 0) {
-
+                    // Get the latest stable release
                     var stableReleaseNb = 0;
                     while (stableReleaseNb < data.length) {
                         if (!data[stableReleaseNb].prerelease) break;
                         stableReleaseNb++;
                     }
-                    if (stableReleaseNb > 0)
-                        stableReleaseNb = stableReleaseNb - 1;
-                    var betaReleaseNb = 0;
-                    while (betaReleaseNb < data.length) {
-                        if (data[betaReleaseNb].prerelease) break;
-                        betaReleaseNb++;
-                    }
-                    if (betaReleaseNb > 0)
-                        betaReleaseNb = betaReleaseNb - 1;
-
-                    var count = 0;
-                    for (var i = 0, n = data.length; i < n; i++) {
-                        count += data[i].assets[0].download_count;
-                    }
-                    $('#download-nb-img').attr('src', 'https://img.shields.io/badge/total%20downloads-' + count + '-FFC400.svg?style=social');
-                    $('#download-nb-img').attr('alt', 'Downloaded ' + count + ' times');
+                    if (stableReleaseNb > data.length)
+                        stableReleaseNb = data.length;
 
                     if (!data[stableReleaseNb].prerelease) {
                         $('#version-img').attr('src', 'https://img.shields.io/badge/latest%20stable%20version-' + data[stableReleaseNb].tag_name + '-limegreen.svg?style=social');
@@ -81,13 +67,30 @@
                     } else {
                         stableReleaseNb = betaReleaseNb;
                     }
+                    $('#latest-download').attr('href', data[stableReleaseNb].assets[0].browser_download_url);
 
+                    // get the latest beta version
+                    var betaReleaseNb = 0;
+                    while (betaReleaseNb < data.length) {
+                        if (data[betaReleaseNb].prerelease) break;
+                        betaReleaseNb++;
+
+                    }
+                    if (betaReleaseNb > data.length)
+                        betaReleaseNb = data.length;
                     if (data[betaReleaseNb].prerelease) {
                         $('#version-beta-img').attr('src', 'https://img.shields.io/badge/latest%20beta%20version-' + data[betaReleaseNb].tag_name + '-orangered.svg?style=social');
                         $('#version-beta-a').attr('href', data[betaReleaseNb].html_url);
                     }
 
-                    $('#latest-download').attr('href', data[stableReleaseNb].assets[0].browser_download_url);
+                    // count the total of downloads
+                    var count = 0;
+                    for (var i = 0, n = data.length; i < n; i++) {
+                        count += data[i].assets[0].download_count;
+                    }
+                    $('#download-nb-img').attr('src', 'https://img.shields.io/badge/total%20downloads-' + count + '-FFC400.svg?style=social');
+                    $('#download-nb-img').attr('alt', 'Downloaded ' + count + ' times');
+
                 }
             });
 
