@@ -73,6 +73,7 @@
                         count += data[i].assets[0].download_count;
                     }
                     $('#download-nb-img').attr('src', 'https://img.shields.io/badge/total%20downloads-' + count + '-FFC400.svg?style=social');
+                    $('#download-nb-img').attr('alt', 'Downloaded ' + count + ' times');
 
                     if (!data[stableReleaseNb].prerelease) {
                         $('#version-img').attr('src', 'https://img.shields.io/badge/latest%20stable%20version-' + data[stableReleaseNb].tag_name + '-limegreen.svg?style=social');
@@ -173,7 +174,7 @@
             </ul>
 
             <h2>Download</h2>
-            <a id="latest-download" class="button button2 doubleLine" href="https://github.com/jcaillon/3P/releases">
+            <a id="latest-download" class="button button2 doubleLine" href="https://github.com/jcaillon/3P/releases/latest">
                 <small>Download latest version</small>
                 .zip file
             </a>
@@ -182,22 +183,22 @@
             <h2>Info</h2>
             <a href="https://www.microsoft.com/en-us/download/details.aspx?id=17851"><img
                     src="https://img.shields.io/badge/requires%20.NET-4.0+-C7023D.svg?style=social"
-                    alt="State"></a>
+                    alt="Requires .NET 4.0+"></a>
             <br>
             <a href="https://notepad-plus-plus.org/download/"><img
                     src="https://img.shields.io/badge/requires%20Notepad++-v6.8+-C7023D.svg?style=social"
-                    alt="State"></a>
+                    alt="Requires Notepad++ 6.8+"></a>
             <br>
             <a href="http://www.gnu.org/licenses/gpl.txt" target="_blank"><img
-                    src="https://img.shields.io/badge/license-GPLv3-blue.svg?style=social" alt="License"></a>
+                    src="https://img.shields.io/badge/license-GPLv3-blue.svg?style=social" alt="Licensed under GPLv3"></a>
             <br>
             <a id="version-a"><img id="version-img"
                                    src="https://img.shields.io/badge/latest%20stable%20version-unavailable-limegreen.svg?style=social"
-                                   alt="Latest version"></a>
+                                   alt="Link to latest stable version"></a>
             <br>
             <a id="version-beta-a"><img id="version-beta-img"
                                         src="https://img.shields.io/badge/latest%20beta%20version-unavailable-orangered.svg?style=social"
-                                        alt="Latest version"></a>
+                                        alt="Link to latest beta version"></a>
             <br>
             <img id="download-nb-img" src="https://img.shields.io/badge/total%20downloads-0-FFC400.svg?style=social"
                  alt="Number of downloads">

@@ -1,4 +1,4 @@
-# Installation #
+# Thanks #
 
 *Last update of this page : 03/03/2016*
 
@@ -10,6 +10,7 @@ I would also like to credit the following websites / persons for their useful an
 * https://github.com/AutoIt/text-encoding-detect
 * Phillip Piper, for his **genious** [objectListView](http://objectlistview.sourceforge.net/cs/index.html)
 * [dot-net-transition](https://code.google.com/archive/p/dot-net-transitions/wikis/CodingWithTransitions.wiki#Adding_the_Transitions_library_to_your_project)
+* [icons 8](https://icons8.com/) for their amazing and free icons!
 
 Thanks to all the alpha testers that helped debugging the software in its early state :
 
