@@ -107,7 +107,7 @@ See what 3P can bring you by *[installing](#/installation)* it! It only takes a 
 
 You can also browse this website through the navigation menu on your right to check out more features of 3P.
 
-*[Learn more here](#/learn-more)*
+*[Learn more here](#/learn_more)*
 
 ***
 
