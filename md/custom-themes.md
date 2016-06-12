@@ -1,6 +1,6 @@
 # Create your own themes #
 
-*Last update of this page : 23/03/2016*
+*Last update of this page : 27/04/2016*
 
 Two topics are discussed here:
 
@@ -13,7 +13,7 @@ This kind of theme only concerns the part of notepad++ where the text is edited:
 
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/cb7fbc4c-f141-11e5-8225-acf88bb9a434.png)
 
-You can the foreground/background color and font weight of any type of keywords displayed in your progress files.
+You can edit the foreground/background color and font weight of any type of keywords displayed in your progress files.
 
 By default, you can only select through a limited amount of options in the `OPTIONS` > `COLOR SCHEMES` page of the application, as shown below :
 

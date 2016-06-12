@@ -1,6 +1,6 @@
 # Home page #
 
-*Last update of this page : 29/02/2016*
+*Last update of this page : 27/04/2016*
 
 ***
 
@@ -99,11 +99,15 @@ With 3P, you can visualize the compilation errors (or PROLINT errors in the scre
 
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_setenv.png)
 
+*[Learn how to set an environment here](#/set_environment)*
+
 ### And more!? ###
 
 See what 3P can bring you by *[installing](#/installation)* it! It only takes a few seconds ;)
 
 You can also browse this website through the navigation menu on your right to check out more features of 3P.
+
+*[Learn more here](#/learn_more)*
 
 ***
 
