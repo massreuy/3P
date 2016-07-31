@@ -6,5 +6,5 @@ This page will link to *useful* topics.
 
 - [Create and modify themes in 3P](#/custom-themes)
 - [Set an environment](#/set_environment)
-- [Compilation path](#/compilation_path)
+- [Automatically deploy your application](#/deployment)
 - [Mass compiler](#/mass_compiler)
