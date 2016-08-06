@@ -49,13 +49,6 @@ The screenshot below gives you a quick overview of 3P's features :
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_overview.png)
 
 
-### Syntax highlighting ###
-
-3P has an embedded syntax highlighter, several themes are available and switchable at will :
-
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/a84d092e-8d45-11e5-87c6-830d40460e14.png)
-
-
 ### Auto-completion ###
 
 A key feature of 3P is the built in auto-completion window. Fully integrated with notepad++, it smooths the developer work by suggesting the best match according to his intention :
@@ -119,6 +112,13 @@ Do you have a large application with a lot of programs that you often need to re
 ![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_compiler.png)
 
 *[Learn more about the mass compiler here](#/mass_compiler)*
+
+
+### Syntax highlighting ###
+
+3P has an embedded syntax highlighter, several themes are available and switchable at will :
+
+![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/a84d092e-8d45-11e5-87c6-830d40460e14.png)
 
 
 ### And more!? ###
