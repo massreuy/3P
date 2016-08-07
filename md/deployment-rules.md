@@ -18,14 +18,21 @@ For non progress files, you can trigger the deployment with the `ACTIONS` > `DEP
 
 Go to the `SET` > `DEPLOYMENT` interface and follow the instructions. At the moment, a text file holds the rules (one rule per line), a user-friendly interface might come later.
 
-### Composition of a rule ### 
+### Two types of rule ### 
 
-Each rule as 5 components :
+- Transfer rules
+- Filter rules
 
+### Composition of a transfer rule ### 
+
+Each transfer rule as 7 components :
+
+- The deployment step
 - The application name filter : If the application name of your current environment matches this filter (you can use wildcards), the rule can apply 
 - The application suffix filter : If the application suffix of your current environment matches this filter (you can use wildcards), the rule can apply 
 - The source path pattern : when deploying, if a file matches this pattern (you can use wildcards), the rule can apply
 - The deployment type : Move, Copy, Prolib (the file will be added to a progress library .pl), Ftp (the file will be sent to an ftp server)
+- Yes/no : yes if more rules can be applied after this one, no to stop at this rule
 - The deployment target : It can either be an absolute path or a relative one; in the second case, it will be relative to the deployment base directory set for your current environment
 
 ### Rules of the rules ###

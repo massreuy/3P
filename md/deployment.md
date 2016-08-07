@@ -15,3 +15,5 @@ The goal of this feature is pretty straightforward : define a set of [rules](htt
 - Send them on a distant server over FTP
 
 The rules are easy to set up but powerful enough to let you create the perfect package for your application.
+
+**insert an awesome graphic here**

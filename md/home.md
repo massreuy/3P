@@ -1,6 +1,6 @@
 # Home page #
 
-*Last update of this page : 15/06/2016*
+*Last update of this page : 07/08/2016*
 
 ***
 
