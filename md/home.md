@@ -89,18 +89,18 @@ You can easily browse the files of your local directory and/or propath with the 
 *[Learn more about this feature here](#/file_explorer)*
 
 
-### Error visualization ###
+### Check syntax and visualize errors ###
 
-With 3P, you can visualize the compilation errors (or PROLINT errors in the screenshot below) directly into notepad++ :
+With 3P, you can visualize the **compilation errors** (or PROLINT errors like in the screenshot below) directly into notepad++ :
 
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_errors.png)
+![image](content_images/2016-08-09_193841.png)
 
 
 ### Adaptability ###
 
 3P has tons of options to help you in your work and to better suit your project needs. Beside all the *classic* options that could be expected from a code editor, 3P also has *4GL progress* oriented options ; like the ability to define several environments, to choose the way prowin is launched, the way database are connected and so on... Below is one of the option page of the application :
 
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_setenv.png)
+![image](content_images/2016-08-09_194022.png)
 
 *[Learn how to set an environment here](#/set_environment)*
 
