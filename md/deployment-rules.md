@@ -40,10 +40,18 @@ Each transfer rule as 7 components :
 - The deployment step : integer (a rule is always defined for a particular step)
 - The application name filter : If the application name of your current environment matches this filter (you can use wildcards), the rule can apply 
 - The application suffix filter : If the application suffix of your current environment matches this filter (you can use wildcards), the rule can apply 
-- The deployment type : `Move` / `Copy` / `Prolib` (the file will be added to a progress library .pl) / `Ftp` (the file will be sent to an ftp server) / `Ftp`
+- The deployment type : `Move` / `Copy` / `Prolib` (the file will be added to a progress library .pl) / `Ftp` (the file will be sent to an ftp server) / `Ftp` (see next § for more details)
 - Execute further rules : `yes` / `no` : yes if more rules can be applied after this one, no to stop at this rule
 - The source path pattern : when deploying, if a file matches this pattern (you can use wildcards), the rule can apply
 - The deployment target : It can either be an absolute path or a relative one; If relative, it will be relative to the deployment base directory set for your current environment
+
+### Type of transfer rules ### 
+
+- Move
+- Copy
+- Prolib : the deployment target must then contain a .pl file, you can adopt the syntax `file.pl\mysubfolder\` to put the file into a special path inside the .pl
+- Zip : the deployment target must then contain a .zip file, you can adopt the syntax `file.zip\mysubfolder\` to put the file into a special path inside the .pl
+- Ftp : the deployment target must follow the syntax `ftp://username:password@server:port/distant/path/` with username, password and port being optionnal; `/distant/path/` represents the path on the ftp server on which to put the deployed file
 
 
 ### Rules of the rules ###
@@ -63,7 +71,7 @@ The following rules are applied during a deployment, work around them to get exa
 **Other rules :**
 
 - A file can have several rules applied to it; however, the first `Move` rule encountered will be the last rule applied
-- If no rules can be applied to a file, then the file will be `Moved` to the deployment base directory by default
-- For the `Prolib` type, you can set the relative folder inside the .pl in which to move a file : `mylib.pl\subfolder1\sub2\`, the files will be added to the Pro-library with the given relative path inside it (`subfolder1\sub2\`)
-- Same rule for `Zip`
+- When no filter rules are defined then all the files are considered (this is only true if there are NO filter rules AT ALL for a given step)
+- For step 0, if no transfer rules can be applied to a file, then the file will be `Moved` to the deployment base directory by default
+- For other steps, if no transfer rules apply then the file is not transfered at all
 - For step 0, if the environment is set to `compile next to source` then the *.r will be moved next to the source and no transfer rules will apply

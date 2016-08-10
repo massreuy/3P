@@ -60,7 +60,6 @@ Any errors are also reported here!
 ![image](content_images/deploy_report.png)
 
 
-
 ## Notes about the compilation ##
 
 In order to be **that** fast, 3P starts several processes of the Progress application (Prowin.exe / Prowin32.exe). It starts *X* processes for each core on your computer (an option that you can set in the page).
@@ -70,3 +69,23 @@ This implies that if you are using a connected database to compile your programs
 It also implies that if you are connected to said database in single-user mono, 3P will start the `MASS COMPILATION` in a single process and you will lose all the benefits of this feature!
 
 *Hint : by default, a database is started to handle 20 users, you can increase this number by adding the following options to your `proserve` command : `-n 80` where 80 is the max number of users*
+
+## A complete example ##
+
+Here is the deployment profile used :
+
+![image](content_images/deploy/deploy_application_screen.png)
+
+The goal is to deploy the application in a distant folder and put some files on an FTP server like illustrated below :
+
+![image](content_images/deploy/folders.png)
+
+In the `DEPLOY YOUR APPLICATION` interface, I clicked on the button `View rules for this environment`
+
+![image](content_images/deploy/rules_screen.png)
+
+For the record, here is the configuration file used :
+
+![image](content_images/deploy/deployment_rules.png)
+
+And [here is a link to the report generated for this deployment](content_images/deploy/report/index.html)
