@@ -4,7 +4,7 @@
 
 This page will hopefully guide you through the process of setting an environment in 3P :
 
-![2016-04-27_104309](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_setenv.png)
+![2016-04-27_104309](content_images/home/set_environmment.png)
 
 ## General idea and goal of this interface ##
 

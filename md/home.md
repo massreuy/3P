@@ -1,6 +1,6 @@
 # Home page #
 
-*Last update of this page : 07/08/2016*
+*Last update of this page : 13/08/2016*
 
 ***
 
@@ -46,14 +46,19 @@ This paragraph briefly presents the main features of 3P (the list is not exhaust
 
 The screenshot below gives you a quick overview of 3P's features :
 
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_overview.png)
+![image](content_images/home/overview.png)
 
+### Main menu ###
+
+Access the main menu of 3P through the top bar icon or with the shortcut `CTRL+Right click` :
+
+![image](content_images/home/main_menu.png)
 
 ### Auto-completion ###
 
 A key feature of 3P is the built in auto-completion window. Fully integrated with notepad++, it smooths the developer work by suggesting the best match according to his intention :
 
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/419a86a4-8d48-11e5-9155-c062659551dd.png)
+![image](content_images/home/autocompletion.png)
 
 *[Learn more about this feature here](#/autocompletion)*
 
@@ -62,7 +67,7 @@ A key feature of 3P is the built in auto-completion window. Fully integrated wit
 
 Tool-tips are another important part of 3P, they provide information on a word. You can activate them by simply hovering a word with your cursor :
 
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/3b6b3e8e-8d54-11e5-8162-297dcb0f4c5c.png)
+![image](content_images/home/tooltips.png)
 
 *[Learn more about this feature here](#/tooltips)*
 
@@ -75,7 +80,7 @@ The code explorer is your best friend when it comes to... exploring the code.
 
 It acts as an improved `function list`, well known to the notepad++ users. It displays the structure of the program and provides a quick way to jump from a code's portion to another (left click an item to get redirected to it) :
 
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_codeexplorer.png)
+![image](content_images/home/code_explorer.png)
 
 *[Learn more about this feature here](#/code_explorer)*
 
@@ -84,7 +89,7 @@ It acts as an improved `function list`, well known to the notepad++ users. It di
 
 You can easily browse the files of your local directory and/or propath with the file explorer. A powerful search tool has been added to make sure you can quickly find the file you are looking for :
 
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_fileexplorer.png)
+![image](content_images/home/file_explorer.png)
 
 *[Learn more about this feature here](#/file_explorer)*
 
@@ -93,32 +98,40 @@ You can easily browse the files of your local directory and/or propath with the 
 
 With 3P, you can visualize the **compilation errors** (or PROLINT errors like in the screenshot below) directly into notepad++ :
 
-![image](content_images/2016-08-09_193841.png)
+![image](content_images/home/compilation_errors.png)
 
 
 ### Adaptability ###
 
 3P has tons of options to help you in your work and to better suit your project needs. Beside all the *classic* options that could be expected from a code editor, 3P also has *4GL progress* oriented options ; like the ability to define several environments, to choose the way prowin is launched, the way database are connected and so on... Below is one of the option page of the application :
 
-![image](content_images/2016-08-09_194022.png)
+![image](content_images/home/set_environmment.png)
 
 *[Learn how to set an environment here](#/set_environment)*
 
 
-### Lighting fast compilation ###
+### Deploy your application ###
 
-Do you have a large application with a lot of programs that you often need to recompile? If so, you will love the `MASS COMPILER` feature of 3P. It uses a multi-threaded compilation that makes it **A LOT** faster than the built-in application compiler (how much faster depends on your computer but you can bet on a 2 digit number). You can compile an entire directory recursively (with filter options!) in one click and get a nice and interactive report to quickly fix the errors.
 
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/home_page_compiler.png)
+** lightning fast compilation **
 
-*[Learn more about the mass compiler here](#/mass_compiler)*
+
+Do you have a large application with a lot of programs that you often need to recompile? 3P uses a multi-process compilation that makes it **A LOT** faster than the built-in application compiler (like x16 faster, or more!). You can compile an entire directory recursively (with filter options!) in one click and get a nice and interactive report to quickly fix the errors.
+
+** Powerful deployment tools **
+
+Do you need to send your r-code to a distant ftp server after compiling them? Do you need to .zip all your configuration files or package r-code in progress libraries (.pl)? Set your deployment rules and 3P can automatically do all of this for you!
+
+![image](content_images/home/deploy_application.png)
+
+*[Learn more about deploying your application here](#/deployment)*
 
 
 ### Syntax highlighting ###
 
 3P has an embedded syntax highlighter, several themes are available and switchable at will :
 
-![image](https://raw.githubusercontent.com/jcaillon/3P/gh-pages/content_images/a84d092e-8d45-11e5-87c6-830d40460e14.png)
+![image](content_images/home/syntax_themes.png)
 
 
 ### And more!? ###
