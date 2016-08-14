@@ -1,6 +1,6 @@
 # The file explorer #
 
-*Last update of this page : 29/02/2016*
+*<small>Last update of this page : 29/02/2016</small>*
 
 * The file explorer has several purposes, the first one is to show the user the errors on a specific file after a compilation, a check syntax or a prolint :
 

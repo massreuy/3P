@@ -1,6 +1,6 @@
 # Deploy your application #
 
-*Last update : 09/08/2016*
+*<small>Last update of this page : 13/08/2016</small>*
 
 ## Goal ##
 

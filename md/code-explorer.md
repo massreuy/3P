@@ -1,6 +1,6 @@
 # The code explorer #
 
-*Last update of this page : 10/12/2015*
+*<small>Last update of this page : 10/12/2015</small>*
 
 * The code explorer acts as an improved `function list`, well known to the notepad++ users. It displays the structure of the program and provides a quick way to jump from a code's portion to another (left click an item to get redirected to it) :
 

@@ -1,6 +1,6 @@
 # Deployment rules #
 
-*Last update : 09/08/2016*
+*<small>Last update of this page : 13/08/2016</small>*
 
 ## Pre-requisite ##
 
@@ -10,7 +10,7 @@ To understand the poinf of the **deployment** rules, you must first read the pag
 
 The **deployment rules** are applied each time you compile a progress file and during a deployment. 
 
-*Yes, the rules are applied when you compile a single file with `CTRL+F1`!*
+*Yes, the rules are applied when you compile a single file with `CTRL+F1`! See [the deployment usage examples page](#/deployment-usage-examples) for more information*
 
 ## How to define a rule ##
 
@@ -30,7 +30,7 @@ Each transfer rule as 5 components :
 - The deployment step : integer (a rule is always defined for a particular step)
 - The application name filter : If the application name of your current environment matches this filter (you can use wildcards), the rule can apply 
 - The application suffix filter : If the application suffix of your current environment matches this filter (you can use wildcards), the rule can apply 
-- Rule type : `+` / `` (or `Include` / `Exclude`) decide if the files matching the *source path pattern* below are included or excluded from the deployment
+- Rule type : `+` / `-` (or `Include` / `Exclude`) decide if the files matching the *source path pattern* below are included or excluded from the deployment
 - The source path pattern : when deploying, if a file matches this pattern (you can use wildcards), the rule can apply
 
 ### Composition of a transfer rule ### 

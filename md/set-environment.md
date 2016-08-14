@@ -1,6 +1,6 @@
 # How to : set an environment #
 
-*Last update of this page : 27/04/2016*
+*<small>Last update of this page : 27/04/2016</small>*
 
 This page will hopefully guide you through the process of setting an environment in 3P :
 

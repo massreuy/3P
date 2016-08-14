@@ -1,6 +1,6 @@
 # Create your own themes #
 
-*Last update of this page : 27/04/2016*
+*<small>Last update of this page : 27/04/2016</small>*
 
 Two topics are discussed here:
 

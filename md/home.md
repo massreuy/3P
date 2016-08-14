@@ -1,25 +1,13 @@
 # Home page #
 
-*Last update of this page : 13/08/2016*
-
-***
-
-
-## Content of this page ##
-
-+ [About this project](#about-this-project)
-+ [Key features](#key-features)
-+ [A final word](#a-final-word)
-
-
-***
+*<small>Last update of this page : 14/08/2016</small>*
 
 
 ## About this project ##
 
 The **OpenEdge** **A**dvanced **B**usiness **L**anguage, or [OpenEdge ABL](https://www.progress.com/openedge) (formerly known as **Progress 4GL**) is a fourth-generation programming language which uses an English-like syntax. Applications developed with this language are portable across computing systems, it uses its own integrated relational database and programming tool which is called the "appbuilder".
 
-Progress Programmers Pal (3P), is a **[notepad++](https://notepad-plus-plus.org/ "Notepad++ home page")** plug-in designed to help writing **ABL code**,  its use is governed by [GPL License](http://www.gnu.org/copyleft/gpl.html).
+Progress Programmers Pal (3P), is a **[notepad++](https://notepad-plus-plus.org/ "Notepad++ home page")** plug-in designed to help **Openedge ABL** developpers, 3P is a **free and open-source** software release under [GPL License](http://www.gnu.org/copyleft/gpl.html).
 
 3P transforms notepad++ into an ABL code editor, providing :
 
@@ -32,9 +20,6 @@ Progress Programmers Pal (3P), is a **[notepad++](https://notepad-plus-plus.org/
 * and so much more!
 
 If you are not fond of the appbuilder and looking for a fast and efficient **ABL editor**, look no further!
-
-
-***
 
 
 ## Key features  ##
@@ -82,7 +67,7 @@ It acts as an improved `function list`, well known to the notepad++ users. It di
 
 ![image](content_images/home/code_explorer.png)
 
-*[Learn more about this feature here](#/code_explorer)*
+*[Learn more about this feature here](#/code-explorer)*
 
 
 ### File explorer ###
@@ -91,7 +76,7 @@ You can easily browse the files of your local directory and/or propath with the 
 
 ![image](content_images/home/file_explorer.png)
 
-*[Learn more about this feature here](#/file_explorer)*
+*[Learn more about this feature here](#/file-explorer)*
 
 
 ### Check syntax and visualize errors ###
@@ -107,18 +92,19 @@ With 3P, you can visualize the **compilation errors** (or PROLINT errors like in
 
 ![image](content_images/home/set_environmment.png)
 
-*[Learn how to set an environment here](#/set_environment)*
+*[Learn how to set an environment here](#/set-environment)*
 
 
 ### Deploy your application ###
 
 
-** lightning fast compilation **
+#### Lightning fast compilation ####
 
 
 Do you have a large application with a lot of programs that you often need to recompile? 3P uses a multi-process compilation that makes it **A LOT** faster than the built-in application compiler (like x16 faster, or more!). You can compile an entire directory recursively (with filter options!) in one click and get a nice and interactive report to quickly fix the errors.
 
-** Powerful deployment tools **
+
+#### Powerful deployment tools ####
 
 Do you need to send your r-code to a distant ftp server after compiling them? Do you need to .zip all your configuration files or package r-code in progress libraries (.pl)? Set your deployment rules and 3P can automatically do all of this for you!
 
@@ -140,8 +126,6 @@ See what 3P can bring you by *[installing](#/installation)* it! It only takes a 
 
 You can also browse this website through the navigation menu on your right to check out more features of 3P.
 
-*[Learn more here](#/learn_more)*
-
 ***
 
 
@@ -151,4 +135,4 @@ One thing the AppBuilder has that 3P doesn't, is the [graphical interface](https
 
 Personally, i use 3P as a **complement** to the AppBuilder, designing interfaces with the graphical tool and switching to notepad++ to modify the core behavior.
 
-Also, at the moment (29/02/2016), 3P does not parse .cls files. But don't worry, this feature will come in a (near) future release.
+Also, at the moment, 3P does not parse .cls files. But don't worry, this feature will come in a (near) future release.

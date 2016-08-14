@@ -1,6 +1,6 @@
 # Thanks #
 
-*Last update of this page : 11/06/2016*
+*<small>Last update of this page : 14/08/2016</small>*
 
 Obviously, I would like to thanks [Don Ho](https://notepad-plus-plus.org/contributors/author.html) and the [community](https://notepad-plus-plus.org/community/) for the awesome tool that is [Notepad++](https://notepad-plus-plus.org/)!
 
@@ -14,7 +14,7 @@ I would also like to credit the following websites / persons for their useful an
 * [Robert Giesecke](https://sites.google.com/site/robertgiesecke/Home/uploads) for his *Unmanaged Exports* package!
 * [Jaime olivares](http://github.com/jaime-olivares/zipstorer) for his ZipStorer class
 * [Alessandro Pilotti](https://ftps.codeplex.com/) for the FtpClient class!
-
+* Patrick Tingen for the awesome [datadigger](https://datadigger.wordpress.com/) 
 
 Thanks to all the alpha testers that helped debugging the software in its early state :
 

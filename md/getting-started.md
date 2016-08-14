@@ -1,8 +1,6 @@
 # Getting started #
 
-*Last update of this page : 20/01/2016*
-
-***
+*<small>Last update of this page : 20/01/2016</small>*
 
 ## Main menu ##
 
@@ -12,7 +10,6 @@ Everything starts with 3P's main menu :
 
 All 3P's features are accessible from this menu, this is the main entry point. Once you are familiar with the software, you can use the direct shortcuts.
 
-***
 
 ## Setting an environment ##
 
