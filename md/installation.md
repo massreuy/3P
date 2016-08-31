@@ -2,12 +2,12 @@
 
 *<small>Last update of this page : 20/08/2016</small>*
 
-### Install Notepad++ ####
+## Install Notepad++ ##
 
 **3P** is a notepad++ plug-in, hence the first step is to download and install the latest version notepad++ at :
 [notepad-plus-plus.org/download/](https://notepad-plus-plus.org/download/).
 
-### Automatic installation of 3P ####
+## Automatic installation of 3P ##
 
 Automatically install 3P through the plugin manager of notepad++ :
 
@@ -20,7 +20,7 @@ Automatically install 3P through the plugin manager of notepad++ :
 
 ![image](content_images/installation/warning.png)
 
-### Manual installation of 3P ###
+## Manual installation of 3P ##
 
 * Stop notepad++
 * Download the [latest version](https://github.com/jcaillon/3P/releases/latest) of 3P (direct download button available on the menu on your right)

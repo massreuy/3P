@@ -64,7 +64,7 @@
                         stableReleaseNb = data.length;
 
                     if (!data[stableReleaseNb].prerelease) {
-                        $('#version-img').attr('src', 'https://img.shields.io/badge/latest%20stable%20version-' + data[stableReleaseNb].tag_name + '-limegreen.svg?style=social');
+                        $('#version-img').attr('src', 'https://img.shields.io/badge/Stable%20version-' + data[stableReleaseNb].tag_name + '-2E78CA.svg?style=flat');
                         $('#version-a').attr('href', data[stableReleaseNb].html_url);
                     } else {
                         stableReleaseNb = betaReleaseNb;
@@ -81,7 +81,7 @@
                     if (betaReleaseNb > data.length)
                         betaReleaseNb = data.length;
                     if (data[betaReleaseNb].prerelease) {
-                        $('#version-beta-img').attr('src', 'https://img.shields.io/badge/latest%20beta%20version-' + data[betaReleaseNb].tag_name + '-orangered.svg?style=social');
+                        $('#version-beta-img').attr('src', 'https://img.shields.io/badge/Beta%20version-' + data[betaReleaseNb].tag_name + '-2E78CA.svg?style=flat');
                         $('#version-beta-a').attr('href', data[betaReleaseNb].html_url);
                     }
 
@@ -90,7 +90,7 @@
                     for (var i = 0, n = data.length; i < n; i++) {
                         count += data[i].assets[0].download_count;
                     }
-                    $('#download-nb-img').attr('src', 'https://img.shields.io/badge/total%20downloads-' + count + '-FFC400.svg?style=social');
+                    $('#download-nb-img').attr('src', 'https://img.shields.io/badge/Total%20downloads-' + count + '-000000.svg?style=flat');
                     $('#download-nb-img').attr('alt', 'Downloaded ' + count + ' times');
 
                 }
@@ -186,21 +186,24 @@
                 <small>Download latest version</small>
                 .zip file
             </a>
+			<a id="version-a"><img id="version-img" src="https://img.shields.io/badge/Stable%20version-Requesting...-741F71.svg?style=flat" alt="Link to latest stable version"></a>
             <br>
+            <a id="version-beta-a"><img id="version-beta-img" src="https://img.shields.io/badge/Beta%20version-Requesting...-741F71.svg?style=flat" alt="Link to latest beta version"></a>
+            <br><br>
 
             <h2>Info</h2>
-            <a href="https://www.microsoft.com/en-us/download/details.aspx?id=17851"><img src="https://img.shields.io/badge/requires%20.NET-4.0+-C7023D.svg?style=social" alt="Requires .NET 4.0+"></a>
+			<a href="https://gitter.im/_3P/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://img.shields.io/badge/Gitter-Join%20chat-741F71.svg?style=flat" alt="Join chat"></a>
+
             <br>
-            <a href="https://notepad-plus-plus.org/download/"><img src="https://img.shields.io/badge/requires%20Notepad++-v6.8+-C7023D.svg?style=social" alt="Requires Notepad++ 6.8+"></a>
+            <img id="download-nb-img" src="https://img.shields.io/badge/Total%20downloads-Requesting...-000000.svg?style=flat" alt="Number of downloads">
             <br>
-            <a href="http://www.gnu.org/licenses/gpl.txt" target="_blank"><img src="https://img.shields.io/badge/license-GPLv3-blue.svg?style=social" alt="Licensed under GPLv3"></a>
+            <a href="https://www.microsoft.com/en-us/download/details.aspx?id=17851"><img src="https://img.shields.io/badge/Requires%20.net-4.0%2B-000000.svg?style=flat" alt="Requires .NET 4.0+"></a>
             <br>
-            <a id="version-a"><img id="version-img" src="https://img.shields.io/badge/latest%20stable%20version-unavailable-limegreen.svg?style=social" alt="Link to latest stable version"></a>
+            <a href="https://notepad-plus-plus.org/download/"><img src="https://img.shields.io/badge/Requires%20notepad++-v6.8+-000000.svg?style=flat" alt="Requires Notepad++ 6.8+"></a>
             <br>
-            <a id="version-beta-a"><img id="version-beta-img" src="https://img.shields.io/badge/latest%20beta%20version-unavailable-orangered.svg?style=social" alt="Link to latest beta version"></a>
+            <a href="http://www.gnu.org/licenses/gpl.txt" target="_blank"><img src="https://img.shields.io/badge/License-GPLv3-000000.svg?style=flat" alt="Licensed under GPLv3"></a>
             <br>
-            <img id="download-nb-img" src="https://img.shields.io/badge/total%20downloads-0-FFC400.svg?style=social" alt="Number of downloads">
-            <br>
+
 
             <p class="repo-owner"><a href="https://github.com/jcaillon/3P"><img src="images/3p-logo.png"></a> was created and is maintained by <a href="https://github.com/jcaillon">Julien Caillon</a>.</p>
 

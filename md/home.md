@@ -1,9 +1,6 @@
-# Home page #
+# About this project #
 
 *<small>Last update of this page : 14/08/2016</small>*
-
-
-## About this project ##
 
 The **OpenEdge** **A**dvanced **B**usiness **L**anguage, or [OpenEdge ABL](https://www.progress.com/openedge) (formerly known as **Progress 4GL**) is a fourth-generation programming language which uses an English-like syntax. Applications developed with this language are portable across computing systems, it uses its own integrated relational database and programming tool which is called the "appbuilder".
 
@@ -22,24 +19,24 @@ Progress Programmers Pal (3P), is a **[notepad++](https://notepad-plus-plus.org/
 If you are not fond of the appbuilder and looking for a fast and efficient **ABL editor**, look no further!
 
 
-## Key features  ##
+# Key features  #
 
 This paragraph briefly presents the main features of 3P (the list is not exhaustive).
 
 
-### Overview ###
+## Overview ##
 
 The screenshot below gives you a quick overview of 3P's features :
 
 ![image](content_images/home/overview.png)
 
-### Main menu ###
+## Main menu ##
 
 Access the main menu of 3P through the top bar icon or with the shortcut `CTRL+Right click` :
 
 ![image](content_images/home/main_menu.png)
 
-### Auto-completion ###
+## Auto-completion ##
 
 A key feature of 3P is the built in auto-completion window. Fully integrated with notepad++, it smooths the developer work by suggesting the best match according to his intention :
 
@@ -48,7 +45,7 @@ A key feature of 3P is the built in auto-completion window. Fully integrated wit
 *[Learn more about this feature here](#/autocompletion)*
 
 
-### Tool-Tips ###
+## Tool-Tips ##
 
 Tool-tips are another important part of 3P, they provide information on a word. You can activate them by simply hovering a word with your cursor :
 
@@ -57,7 +54,7 @@ Tool-tips are another important part of 3P, they provide information on a word. 
 *[Learn more about this feature here](#/tooltips)*
 
 
-### Code explorer ###
+## Code explorer ##
 
 The code explorer is your best friend when it comes to... exploring the code.
 
@@ -70,7 +67,7 @@ It acts as an improved `function list`, well known to the notepad++ users. It di
 *[Learn more about this feature here](#/code-explorer)*
 
 
-### File explorer ###
+## File explorer ##
 
 You can easily browse the files of your local directory and/or propath with the file explorer. A powerful search tool has been added to make sure you can quickly find the file you are looking for :
 
@@ -79,14 +76,14 @@ You can easily browse the files of your local directory and/or propath with the 
 *[Learn more about this feature here](#/file-explorer)*
 
 
-### Check syntax and visualize errors ###
+## Check syntax and visualize errors ##
 
 With 3P, you can visualize the **compilation errors** (or PROLINT errors like in the screenshot below) directly into notepad++ :
 
 ![image](content_images/home/compilation_errors.png)
 
 
-### Adaptability ###
+## Adaptability ##
 
 3P has tons of options to help you in your work and to better suit your project needs. Beside all the *classic* options that could be expected from a code editor, 3P also has *4GL progress* oriented options ; like the ability to define several environments, to choose the way prowin is launched, the way database are connected and so on... Below is one of the option page of the application :
 
@@ -95,16 +92,16 @@ With 3P, you can visualize the **compilation errors** (or PROLINT errors like in
 *[Learn how to set an environment here](#/set-environment)*
 
 
-### Deploy your application ###
+## Deploy your application ##
 
 
-#### Lightning fast compilation ####
+### Lightning fast compilation ###
 
 
 Do you have a large application with a lot of programs that you often need to recompile? 3P uses a multi-process compilation that makes it **A LOT** faster than the built-in application compiler (like x16 faster, or more!). You can compile an entire directory recursively (with filter options!) in one click and get a nice and interactive report to quickly fix the errors.
 
 
-#### Powerful deployment tools ####
+### Powerful deployment tools ###
 
 Do you need to send your r-code to a distant ftp server after compiling them? Do you need to .zip all your configuration files or package r-code in progress libraries (.pl)? Set your deployment rules and 3P can automatically do all of this for you!
 
@@ -113,14 +110,14 @@ Do you need to send your r-code to a distant ftp server after compiling them? Do
 *[Learn more about deploying your application here](#/deployment)*
 
 
-### Syntax highlighting ###
+## Syntax highlighting ##
 
 3P has an embedded syntax highlighter, several themes are available and switchable at will :
 
 ![image](content_images/home/syntax_themes.png)
 
 
-### And more!? ###
+## And more!? ##
 
 See what 3P can bring you by *[installing](#/installation)* it! It only takes a few seconds ;)
 
@@ -129,7 +126,7 @@ You can also browse this website through the navigation menu on your right to ch
 ***
 
 
-## A final word ##
+# A final word #
 
 One thing the AppBuilder has that 3P doesn't, is the [graphical interface](https://documentation.progress.com/output/ua/OpenEdge_latest/index.html#page/gsstu/overview-of-the-openedge-appbuilder.html) to modify your .w files. You can do it by code, obviously, but i admit that it's not a simple task.
 
