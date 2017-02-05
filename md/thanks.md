@@ -22,6 +22,4 @@ Thanks to all the alpha testers that helped debugging the software in its early 
 * [hgrandperrin](https://github.com/hgrandperrin)
 * [quent1989](https://github.com/quent1989)
 
-Special thanks to [hgrandperrin](https://github.com/hgrandperrin) for making the new logo!
-
 And finally, thank **YOU** for visiting this website, enjoy 3P!
