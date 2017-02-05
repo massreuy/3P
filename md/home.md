@@ -1,6 +1,6 @@
 # About this project #
 
-*<small>Last update of this page : 14/08/2016</small>*
+*<small>Last update of this page : 05/02/2017</small>*
 
 The **OpenEdge** **A**dvanced **B**usiness **L**anguage, or [OpenEdge ABL](https://www.progress.com/openedge) (formerly known as **Progress 4GL**) is a fourth-generation programming language which uses an English-like syntax. Applications developed with this language are portable across computing systems, it uses its own integrated relational database and programming tool which is called the "appbuilder".
 
