@@ -2,13 +2,13 @@
 <html>
 <head>
     <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="description=" content="Progress Programmers Pal (3P), is a FREE / OpenSource notepad++ plugin designed to help writing OpenEdge ABL / Progress 4GL code. 3P transforms notepad++ into a powerful ABL IDE (Integrated Development Environment) / code editor, providing : syntax checking, compilation, auto-completion, tooltips, and much more! 3P is a lot more powerful than the appbuilder and a LOT lighter than Developper studio, it offers a free and viable alternative to those tools">
     <meta name="keywords" content="4GL,ABL,OpenEdge,Progress,3P,Notepad++,plugin,code,editor,auto-completion,autocompletion,tooltip,tool-tip,compile,compilation,fast,light,mass,compiler,IDE,free,OpenSource,open,source,syntax,hightlight,highlighting,check,datadigger,data-digger,database,management,download,software,developper,studio,appbuilder,app,builder,deploy,pl,library,libraries,zip,ftp,development,program,integrated,environment,deployment,jcaillon,caillon,julien">
 	<meta name="author" content="Julien Caillon">
     <link rel="icon" href="images/logo.ico" />
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Chau+Philomene+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
@@ -30,7 +30,7 @@
             scrolltoTop();
             $('#page-content').fadeOut(200, function () {
                 $('#loader').empty();
-                $('#loader').append("<img src='images/717.GIF'>");
+                $('#loader').append("<img src='images/loading.gif'>");
                 jQuery.get(html, function(data) {
                     $('#page-content').empty();
                     var htmlContent = marked(data);
@@ -51,50 +51,6 @@
         }
 
         $(document).ready(function () {
-            // get data from github API
-            $.getJSON("https://api.github.com/repos/jcaillon/3p/releases").done(function (data) {
-                if (data.length > 0) {
-                    // Get the latest stable release
-                    var stableReleaseNb = 0;
-                    while (stableReleaseNb < data.length) {
-                        if (!data[stableReleaseNb].prerelease) break;
-                        stableReleaseNb++;
-                    }
-                    if (stableReleaseNb > data.length)
-                        stableReleaseNb = data.length;
-
-                    if (!data[stableReleaseNb].prerelease) {
-                        $('#version-img').attr('src', 'https://img.shields.io/badge/Stable%20version-' + data[stableReleaseNb].tag_name + '-2E78CA.svg?style=flat');
-                        $('#version-a').attr('href', data[stableReleaseNb].html_url);
-                    } else {
-                        stableReleaseNb = betaReleaseNb;
-                    }
-                    $('#latest-download').attr('href', data[stableReleaseNb].assets[0].browser_download_url);
-
-                    // get the latest beta version
-                    var betaReleaseNb = 0;
-                    while (betaReleaseNb < data.length) {
-                        if (data[betaReleaseNb].prerelease) break;
-                        betaReleaseNb++;
-
-                    }
-                    if (betaReleaseNb > data.length)
-                        betaReleaseNb = data.length;
-                    if (data[betaReleaseNb].prerelease) {
-                        $('#version-beta-img').attr('src', 'https://img.shields.io/badge/Beta%20version-' + data[betaReleaseNb].tag_name + '-2E78CA.svg?style=flat');
-                        $('#version-beta-a').attr('href', data[betaReleaseNb].html_url);
-                    }
-
-                    // count the total of downloads
-                    var count = 0;
-                    for (var i = 0, n = data.length; i < n; i++) {
-                        count += data[i].assets[0].download_count;
-                    }
-                    $('#download-nb-img').attr('src', 'https://img.shields.io/badge/Total%20downloads-' + count + '-000000.svg?style=flat');
-                    $('#download-nb-img').attr('alt', 'Downloaded ' + count + ' times');
-
-                }
-            });
 
             // display/hide the back to top link
             $(window).scroll(function () {
@@ -123,10 +79,10 @@
                     loadtocontent("md/home.md");
                 }
 
-                // add the class 'selected' to the page link, linking to the current page
-                $('#pagelinks li a').each(function(){
+                // add the class 'selectedlink' to the page link, linking to the current page
+                $('ul.pagelinks li a').each(function(){
                     var that = $(this);
-                    that[ that.attr( 'href' ) === location.hash ? 'addClass' : 'removeClass' ]( 'selected' );
+                    that[ that.attr( 'href' ) === location.hash ? 'addClass' : 'removeClass' ]( 'selectedlink' );
                 });
 
             })
@@ -134,6 +90,63 @@
             // Since the event is only triggered when the hash changes, we need to trigger
             // the event now, to handle the hash the page may have loaded with.
             $(window).hashchange();
+
+            // get data from github API
+            $.getJSON("https://api.github.com/repos/jcaillon/3p/releases").done(function (data) {
+                if (data.length > 0) {
+                    // Get the latest stable release
+                    var stableReleaseNb = 0;
+                    while (stableReleaseNb < data.length) {
+                        if (!data[stableReleaseNb].prerelease) break;
+                        stableReleaseNb++;
+                    }
+                    if (stableReleaseNb > data.length)
+                        stableReleaseNb = data.length;
+
+                    if (!data[stableReleaseNb].prerelease) {        
+                        for (var i=0; i < data[stableReleaseNb].assets.length; i++) {
+                            if (data[stableReleaseNb].assets[i].name == "3P.zip") {
+                                $('#stable_link').attr('href', data[stableReleaseNb].assets[i].browser_download_url);
+                                $('#stable_text').html(data[stableReleaseNb].tag_name);
+                            } else if (data[stableReleaseNb].assets[i].name == "3P_x64.zip") {
+                                $('#stable64_link').attr('href', data[stableReleaseNb].assets[i].browser_download_url);
+                                $('#stable64_text').html(data[stableReleaseNb].tag_name);
+                            }
+                        }
+                    } else {
+                        stableReleaseNb = betaReleaseNb;
+                    }
+
+                    // get the latest beta version
+                    var betaReleaseNb = 0;
+                    while (betaReleaseNb < data.length) {
+                        if (data[betaReleaseNb].prerelease) break;
+                        betaReleaseNb++;
+
+                    }
+                    if (betaReleaseNb > data.length)
+                        betaReleaseNb = data.length;
+                    if (data[betaReleaseNb].prerelease) {
+                        for (var i=0; i < data[betaReleaseNb].assets.length; i++) {
+                            if (data[betaReleaseNb].assets[i].name == "3P.zip") {
+                                $('#beta_link').attr('href', data[betaReleaseNb].assets[i].browser_download_url);
+                                $('#beta_text').html(data[betaReleaseNb].tag_name);
+                            } else if (data[betaReleaseNb].assets[i].name == "3P_x64.zip") {
+                                $('#beta64_link').attr('href', data[betaReleaseNb].assets[i].browser_download_url);
+                                $('#beta64_text').html(data[betaReleaseNb].tag_name);
+                            }
+                        }
+                    }
+
+                    // count the total of downloads
+                    var count = 0;
+                    for (var i = 0, n = data.length; i < n; i++) {
+                        count += data[i].assets[0].download_count;
+                    }
+                    $('#totaldl_text').html(count);
+
+                }
+            });
 
         });
 
@@ -146,27 +159,31 @@
     <a href="#/home" class="back-in-time"><i class="fa fa-home"></i></a>
 
     <div class="inner">
-        <h1>3P</h1>
-        <h2>Progress Programmers Pal (3P), is an OpenEdge ABL (formerly 4GL Progress) IDE / code editor running on
-            notepad++</h2>
+        <div class="logo">
+            <h1>3P <span class="subtitle"> :  Progress Programmers Pal</span></h1>
+            <h2>An OpenEdge ABL (formerly 4GL Progress) code editor / IDE running on
+                notepad++</h2>
+        </div>
         <a href="https://github.com/jcaillon/3P" class="button">
             <small>View project on</small>
             GitHub</a>
     </div>
+
 </header>
 
 <div id="content-wrapper">
     <div class="inner clearfix">
     
-        <section id="main-content">
+        <div id="main-content">
             <div id="page-content"></div>
             <div id="loader" style="text-align: center;"></div>
-        </section>
+        </div>
 
         <aside id="sidebar">
 
-            <h2>Pages</h2>
-            <ul id="pagelinks">
+            <div class="sidetitle img-browse">Browse</div>
+
+            <ul class="pagelinks">
                 <li><a href="#/home">Home page</a></li>
                 <li><a href="#/installation">Installation</a></li>
                 <li><a href="#/getting-started">Getting started</a></li>
@@ -181,33 +198,40 @@
 				<li><a href="#/deployment-rules">Deployment rules</a></li>
             </ul>
 
-            <h2>Download</h2>
-            <a id="latest-download" class="button button2 doubleLine" href="https://github.com/jcaillon/3P/releases/latest">
-                <small>Download latest version</small>
-                .zip file
-            </a>
-			<a id="version-a"><img id="version-img" src="https://img.shields.io/badge/Stable%20version-Requesting...-741F71.svg?style=flat" alt="Link to latest stable version"></a>
-            <br>
-            <a id="version-beta-a"><img id="version-beta-img" src="https://img.shields.io/badge/Beta%20version-Requesting...-741F71.svg?style=flat" alt="Link to latest beta version"></a>
-            <br><br>
 
-            <h2>Info</h2>
-			<a href="https://gitter.im/_3P/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://img.shields.io/badge/Gitter-Join%20chat-741F71.svg?style=flat" alt="Join chat"></a>
+            <div class="sidetitle img-download">Download</div>
 
-            <br>
-            <img id="download-nb-img" src="https://img.shields.io/badge/Total%20downloads-Requesting...-000000.svg?style=flat" alt="Number of downloads">
-            <br>
-            <a href="https://www.microsoft.com/en-us/download/details.aspx?id=17851"><img src="https://img.shields.io/badge/Requires%20.net-4.0%2B-000000.svg?style=flat" alt="Requires .NET 4.0+"></a>
-            <br>
-            <a href="https://notepad-plus-plus.org/download/"><img src="https://img.shields.io/badge/Requires%20notepad++-v6.8+-000000.svg?style=flat" alt="Requires Notepad++ 6.8+"></a>
-            <br>
-            <a href="http://www.gnu.org/licenses/gpl.txt" target="_blank"><img src="https://img.shields.io/badge/License-GPLv3-000000.svg?style=flat" alt="Licensed under GPLv3"></a>
-            <br>
-
-
-            <p class="repo-owner"><a href="https://github.com/jcaillon/3P"><img src="images/3p-logo.png"></a> was created and is maintained by <a href="https://github.com/jcaillon">Julien Caillon</a>.</p>
-
-            <p>This page is based on the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+            <div class="stabledownload">
+                <a id="stable_link" href="https://github.com/jcaillon/3P/releases/latest"><span class="shield1">Stable</span><span id="stable_text" class="shield2">Requesting...</span></a>
+                <br>
+                <a id="stable64_link" href="https://github.com/jcaillon/3P/releases/latest"><span class="shield1">Stable (64 bits)</span><span id="stable64_text" class="shield2">none</span></a>
+            </div>
+            <div class="paddingleft">
+                <a href="https://github.com/jcaillon/3P/releases"><small>Read version notes here!</small></a>
+                <br><br>
+            </div>
+            <div class="betadownload">
+                <a id="beta_link" href="https://github.com/jcaillon/3P/releases/latest"><span class="shield1">BETA</span><span id="beta_text" class="shield2">Requesting...</span></a>
+                <br>
+                <a id="beta64_link" href="https://github.com/jcaillon/3P/releases/latest"><span class="shield1">BETA (64 bits)</span><span id="beta64_text" class="shield2">Requesting...</span></a>
+            </div>
+            
+            
+            <div class="sidetitle img-info">Info</div>
+            
+            <div class="paddingleft">
+                <a href="https://notepad-plus-plus.org/download/"><span class="shield1">Requires Notepad++</span><span class="shield2">6.8++</span></a>
+                <br>
+                <a href="https://www.microsoft.com/en-us/download/details.aspx?id=17851"><span class="shield1">Requires .NET</span><span class="shield2">4.0+</span></a>
+                <br>
+                <a href="http://www.gnu.org/licenses/gpl.txt"><span class="shield1">License</span><span class="shield2">GPLv3</span></a>
+                <br>
+                <a href="https://gitter.im/_3P/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><span class="shield1">Gitter</span><span class="shield2">Join the chat</span></a>
+                <br>
+                <span class="shield1">Total downloads</span><span class="shield2" id="totaldl_text">Requesting...</span>
+                <br>
+                <a href="https://github.com/jcaillon"><span class="shield1">Author</span><span class="shield2">Julien Caillon</span></a>
+            </div>
         </aside>
         
     </div>
