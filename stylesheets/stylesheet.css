@@ -488,6 +488,15 @@ header h2 {
   background-position: 0 0px;
 }
 
+#loading {
+  text-align: center;
+  font-size: 60px;
+  font-weight: normal;
+  color: #fff;
+  letter-spacing: -1px;
+  padding-top: 30px;
+}
+
 
 .inner {
   position: relative;
@@ -600,8 +609,8 @@ aside span.shield2 {
     text-align: center;
     margin: 0px;
     padding: 2px 4px;
-    color: #000;
-    background-color: #E8EFF6;
+    color: #56DA74;
+    background-color: #293338;
     -webkit-border-top-right-radius: 5px;
     -webkit-border-bottom-right-radius: 5px;
     -moz-border-radius-topright: 5px;

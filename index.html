@@ -30,7 +30,7 @@
             scrolltoTop();
             $('#page-content').fadeOut(200, function () {
                 $('#loader').empty();
-                $('#loader').append("<img src='images/loading.gif'>");
+                $('#loader').append("<div id='loading'>LOADING...</div>");
                 jQuery.get(html, function(data) {
                     $('#page-content').empty();
                     var htmlContent = marked(data);
@@ -174,8 +174,8 @@
 <div id="content-wrapper">
     <div class="inner clearfix">
     
-        <div id="main-content">
-            <div id="page-content"></div>
+        <div id="main-content">            
+            <div id="page-content"><div id="loading">LOADING...</div></div>
             <div id="loader" style="text-align: center;"></div>
         </div>
 
