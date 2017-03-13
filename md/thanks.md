@@ -6,7 +6,7 @@ Obviously, I would like to thanks [Don Ho](https://notepad-plus-plus.org/contrib
 
 I would also like to credit the following websites / persons for their useful and inspiring work:
 
-* Jacob Slusser, [for his generic gap buffer class](http://www.codeproject.com/Articles/20910/Generic-Gap-Buffer)
+* Jacob Slusser, [for his generic gap buffer class](http://www.codeproject.com/Articles/20910/Generic-Gap-Buffer) and for [ScintillaNET](https://github.com/jacobslusser/ScintillaNET)
 * https://github.com/AutoIt/text-encoding-detect
 * Phillip Piper, for his **genious** [objectListView](http://objectlistview.sourceforge.net/cs/index.html)
 * [dot-net-transition](https://code.google.com/archive/p/dot-net-transitions/wikis/CodingWithTransitions.wiki#Adding_the_Transitions_library_to_your_project)
@@ -15,6 +15,7 @@ I would also like to credit the following websites / persons for their useful an
 * [Jaime olivares](http://github.com/jaime-olivares/zipstorer) for his ZipStorer class
 * [Alessandro Pilotti](https://ftps.codeplex.com/) for the FtpClient class!
 * Patrick Tingen for the awesome [datadigger](https://datadigger.wordpress.com/) 
+* Knagis for his great [CommonMark](https://github.com/Knagis/CommonMark.NET) markdown library
 
 Thanks to all the alpha testers that helped debugging the software in its early state :
 
