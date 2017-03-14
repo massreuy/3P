@@ -56,22 +56,22 @@ namespace _3PA.MainFeatures.Pro {
             var canIndent = ParserHandler.AblParser.ParserErrors.Count == 0;
 
             // start indenting
-            Sci.BeginUndoAction();
+            Npp.Editor.BeginUndoAction();
 
             StringBuilder x = new StringBuilder();
-            var indentWidth = Sci.TabWidth;
+            var indentWidth = Npp.Editor.TabWidth;
             var i = 0;
             var dic = ParserHandler.AblParser.LineInfo;
             while (dic.ContainsKey(i)) {
                 if (canIndent)
-                    Sci.GetLine(i).Indentation = dic[i].BlockDepth*indentWidth;
+                    Npp.Editor.GetLine(i).Indentation = dic[i].BlockDepth*indentWidth;
                 else
                     x.AppendLine(i + 1 + " > " + dic[i].BlockDepth + " , " + dic[i].Scope.ScopeType + " , " + dic[i].Scope.Name);
                 i++;
             }
             Utils.FileWriteAllText(linesLogFile, x.ToString());
 
-            Sci.EndUndoAction();
+            Npp.Editor.EndUndoAction();
 
             // Can we indent? We can't if we didn't parse the code correctly or if there are grammar errors
             if (!canIndent) {

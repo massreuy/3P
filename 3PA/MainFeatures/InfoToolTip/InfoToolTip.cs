@@ -101,17 +101,17 @@ namespace _3PA.MainFeatures.InfoToolTip {
             if (Config.Instance.ToolTipDeactivate) return;
             InitIfneeded();
 
-            var position = Sci.GetPositionFromMouseLocation();
+            var position = Npp.Editor.GetPositionFromMouseLocation();
             if (position < 0)
                 return;
 
             // check caret context, dont display a tooltip for comments
-            var curContext = (UdlStyles) Sci.GetStyleAt(position);
+            var curContext = (UdlStyles) Npp.Editor.GetStyleAt(position);
             if (curContext == UdlStyles.Comment || curContext == UdlStyles.Delimiter8)
                 return;
 
             // sets the tooltip content
-            var data = AutoCompletion.FindInCompletionData(Sci.GetAblWordAtPosition(position), position);
+            var data = AutoCompletion.FindInCompletionData(Npp.Editor.GetAblWordAtPosition(position), position);
             if (data != null && data.Count > 0)
                 _currentCompletionList = data;
             else
@@ -124,9 +124,9 @@ namespace _3PA.MainFeatures.InfoToolTip {
             SetToolTip();
 
             // update position
-            var point = Sci.GetPointXyFromPosition(position);
-            point.Offset(Sci.GetScintillaRectangle().Location);
-            var lineHeight = Sci.TextHeight(Sci.Line.CurrentLine);
+            var point = Npp.Editor.GetPointXyFromPosition(position);
+            point.Offset(Npp.Editor.GetScintillaRectangle().Location);
+            var lineHeight = Npp.Editor.TextHeight(Npp.Editor.CurrentLine);
             point.Y += lineHeight + 5;
             _form.Location = _form.GetBestAutocompPosition(point, lineHeight + 5);
 
@@ -403,7 +403,7 @@ namespace _3PA.MainFeatures.InfoToolTip {
                         // for the keywords define and create, we try to match the second keyword that goes with it
                         if (data.KeywordType == KeywordType.Statement &&
                             (keyword.EqualsCi("define") || keyword.EqualsCi("create"))) {
-                            var lineStr = Sci.GetLine(Sci.LineFromPosition(Sci.GetPositionFromMouseLocation())).Text;
+                            var lineStr = Npp.Editor.GetLine(Npp.Editor.LineFromPosition(Npp.Editor.GetPositionFromMouseLocation())).Text;
                             var listOfSecWords = new List<string> {"ALIAS", "BROWSE", "BUFFER", "BUTTON", "CALL", "CLIENT-PRINCIPAL", "DATA-SOURCE", "DATABASE", "DATASET", "EVENT", "FRAME", "IMAGE", "MENU", "PARAMETER", "PROPERTY", "QUERY", "RECTANGLE", "SAX-ATTRIBUTES", "SAX-READER", "SAX-WRITER", "SERVER", "SERVER-SOCKET", "SOAP-HEADER", "SOAP-HEADER-ENTRYREF", "SOCKET", "STREAM", "SUB-MENU", "TEMP-TABLE", "VARIABLE", "WIDGET-POOL", "WORK-TABLE", "WORKFILE", "X-DOCUMENT", "X-NODEREF"};
                             foreach (var word in listOfSecWords) {
                                 if (lineStr.ContainsFast(word)) {

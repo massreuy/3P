@@ -109,7 +109,7 @@ namespace _3PA.MainFeatures.NppInterfaceForm {
             // register to Npp
             Npp.RegisterToNpp(Handle);
 
-            CurrentForegroundWindow = Sci.HandleScintilla;
+            CurrentForegroundWindow = Npp.Editor.Handle;
 
             Opacity = 0;
             Visible = false;
@@ -166,7 +166,7 @@ namespace _3PA.MainFeatures.NppInterfaceForm {
         /// </summary>
         protected void GiveFocusBack() {
             if (GiveFocusBackToScintilla)
-                Sci.GrabFocus();
+                Npp.Editor.GrabFocus();
             else
                 WinApi.SetForegroundWindow(CurrentForegroundWindow);
             IsActivated = !IsActivated;

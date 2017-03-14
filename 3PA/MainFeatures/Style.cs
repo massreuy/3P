@@ -187,7 +187,7 @@ namespace _3PA.MainFeatures {
                 SetFontStyle((byte) SciMsg.STYLE_BRACEBAD, curTheme.BadBraceHighLight);
 
                 // smart highlighting in npp
-                Sci.GetIndicator(29).ForeColor = curTheme.SmartHighLighting.ForeColor;
+                Npp.Editor.GetIndicator(29).ForeColor = curTheme.SmartHighLighting.ForeColor;
             }
 
             // Setting styles for errors 
@@ -199,7 +199,7 @@ namespace _3PA.MainFeatures {
         }
 
         public static void SetFontStyle(byte styleNumber, StyleThemeItem styleItem) {
-            var nppStyle = Sci.GetStyle(styleNumber);
+            var nppStyle = Npp.Editor.GetStyle(styleNumber);
 
             if (styleItem.BackColor != Color.Transparent)
                 nppStyle.BackColor = styleItem.BackColor;
@@ -223,29 +223,29 @@ namespace _3PA.MainFeatures {
         /// <param name="bgColor"></param>
         /// <param name="fgColor"></param>
         private static void SetErrorStyles(byte errorLevel, Color bgColor, Color fgColor) {
-            int curFontSize = Sci.GetStyle(0).Size;
+            int curFontSize = Npp.Editor.GetStyle(0).Size;
 
-            var normalStyle = Sci.GetStyle(FilesInfo.GetStyleOf((ErrorLevel) errorLevel, ErrorFontWeight.Normal));
+            var normalStyle = Npp.Editor.GetStyle(FilesInfo.GetStyleOf((ErrorLevel) errorLevel, ErrorFontWeight.Normal));
             normalStyle.Font = "Segoe ui";
             normalStyle.Size = (int) (curFontSize*0.9);
             normalStyle.ForeColor = fgColor;
             normalStyle.BackColor = bgColor;
 
-            var boldStyle = Sci.GetStyle(FilesInfo.GetStyleOf((ErrorLevel) errorLevel, ErrorFontWeight.Bold));
+            var boldStyle = Npp.Editor.GetStyle(FilesInfo.GetStyleOf((ErrorLevel) errorLevel, ErrorFontWeight.Bold));
             boldStyle.Font = "Segoe ui";
             boldStyle.Size = (int) (curFontSize*0.9);
             boldStyle.Bold = true;
             boldStyle.ForeColor = fgColor;
             boldStyle.BackColor = bgColor;
 
-            var italicStyle = Sci.GetStyle(FilesInfo.GetStyleOf((ErrorLevel) errorLevel, ErrorFontWeight.Italic));
+            var italicStyle = Npp.Editor.GetStyle(FilesInfo.GetStyleOf((ErrorLevel) errorLevel, ErrorFontWeight.Italic));
             italicStyle.Font = "Segoe ui";
             italicStyle.Size = (int) (curFontSize*0.9);
             italicStyle.Italic = true;
             italicStyle.ForeColor = fgColor;
             italicStyle.BackColor = bgColor;
 
-            var markerStyle = Sci.GetMarker(errorLevel);
+            var markerStyle = Npp.Editor.GetMarker(errorLevel);
             markerStyle.Symbol = MarkerSymbol.SmallRect;
             markerStyle.SetBackColor(bgColor);
             markerStyle.SetForeColor(fgColor);
@@ -261,10 +261,10 @@ namespace _3PA.MainFeatures {
         /// <returns></returns>
         public static bool IsCarretInNormalContext(int curPos) {
             try {
-                var curContext = (UdlStyles) Sci.GetStyleAt(curPos);
+                var curContext = (UdlStyles) Npp.Editor.GetStyleAt(curPos);
                 if (curPos <= 0) return true;
                 if (IsNormalContext(curContext)) return true;
-                var prevContext = (UdlStyles) Sci.GetStyleAt(curPos - 1);
+                var prevContext = (UdlStyles) Npp.Editor.GetStyleAt(curPos - 1);
                 return IsNormalContext(prevContext);
             } catch (Exception) {
                 // we can be here if the style ID isn't in the UdlStyles enum

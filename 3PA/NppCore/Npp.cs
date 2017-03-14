@@ -41,7 +41,45 @@ using _3PA.WindowsCore;
 
 namespace _3PA.NppCore {
 
-    internal static partial class Npp {
+    internal static class Npp {
+
+        #region Editor (scintilla instance)
+
+        private static Sci _currentScintilla;
+        private static Sci _primaryScintilla;
+        private static Sci _secondaryScintilla;
+        private static int _curScintillaNb;
+
+        public static Sci Editor {
+            get { return _currentScintilla; }
+        }
+        
+        /// <summary>
+        /// Updates the current scintilla handle for Npp's functions
+        /// Called when the user changes the current document
+        /// </summary>
+        public static void UpdateScintilla() {
+
+            if (_primaryScintilla == null) {
+                _primaryScintilla = new Sci(UnmanagedExports.NppData._scintillaMainHandle);
+                _secondaryScintilla = new Sci(UnmanagedExports.NppData._scintillaSecondHandle);
+            }
+
+            long curScintilla;
+            Win32Api.SendMessage(HandleNpp, NppMsg.NPPM_GETCURRENTSCINTILLA, 0, out curScintilla);
+            _curScintillaNb = ((int)curScintilla).ClampMax(1);
+            _currentScintilla = _curScintillaNb == 0 ? _primaryScintilla : _secondaryScintilla;
+        }
+
+        /// <summary>
+        /// Returns the current instance of scintilla used
+        /// 0/1 corresponding to the main/seconday scintilla currently used
+        /// </summary>
+        public static int CurrentScintilla {
+            get { return _curScintillaNb; }
+        }
+
+        #endregion
 
         #region Static
 
@@ -190,7 +228,7 @@ namespace _3PA.NppCore {
                 return;
             }
             if (saveHistoric && CurrentFile.IsProgress) {
-                _goToHistory.Push(new Tuple<string, int, Point>(CurrentFile.Path, Sci.FirstVisibleLine, Sci.CurrentPoint));
+                _goToHistory.Push(new Tuple<string, int, Point>(CurrentFile.Path, Editor.FirstVisibleLine, Editor.CurrentPoint));
             }
 
             if (!String.IsNullOrEmpty(document) && !document.Equals(CurrentFile.Path)) {
@@ -201,17 +239,17 @@ namespace _3PA.NppCore {
             }
 
             if (position >= 0) {
-                Sci.GoToLine(Sci.LineFromPosition(position));
-                Sci.SetSel(position);
+                Editor.GoToLine(Editor.LineFromPosition(position));
+                Editor.SetSel(position);
             } else if (line >= 0) {
-                Sci.GoToLine(line);
+                Editor.GoToLine(line);
                 if (column >= 0)
-                    Sci.SetSel(Sci.GetPosFromLineColumn(line, column));
+                    Editor.SetSel(Editor.GetPosFromLineColumn(line, column));
                 else
-                    Sci.SetSel(Sci.GetLine(line).Position);
+                    Editor.SetSel(Editor.GetLine(line).Position);
             }
 
-            Sci.GrabFocus();
+            Editor.GrabFocus();
             Plug.OnUpdateSelection();
         }
 
@@ -230,7 +268,7 @@ namespace _3PA.NppCore {
                 if (_goToHistory.Count > 0) {
                     var lastPoint = _goToHistory.Pop();
                     Goto(lastPoint.Item1, -1, lastPoint.Item3.X, lastPoint.Item3.Y, false);
-                    Sci.FirstVisibleLine = lastPoint.Item2;
+                    Editor.FirstVisibleLine = lastPoint.Item2;
                 }
             } catch (Exception e) {
                 ErrorHandler.ShowErrors(e, "Error in GoBackFromDefinition");

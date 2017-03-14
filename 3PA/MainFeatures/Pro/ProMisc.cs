@@ -50,10 +50,10 @@ namespace _3PA.MainFeatures.Pro {
             }
 
             // try to go to the definition of the selected word
-            var position = fromMouseClick ? Sci.GetPositionFromMouseLocation() : Sci.CurrentPosition;
+            var position = fromMouseClick ? Npp.Editor.GetPositionFromMouseLocation() : Npp.Editor.CurrentPosition;
             if (fromMouseClick && position <= 0)
                 return;
-            var curWord = Sci.GetAblWordAtPosition(position);
+            var curWord = Npp.Editor.GetAblWordAtPosition(position);
 
             // match a word in the autocompletion? go to definition
             var data = AutoCompletion.FindInCompletionData(curWord, position, true);
@@ -159,7 +159,7 @@ namespace _3PA.MainFeatures.Pro {
             if (InfoToolTip.InfoToolTip.IsVisible && !string.IsNullOrEmpty(InfoToolTip.InfoToolTip.CurrentWord))
                 searchWord = InfoToolTip.InfoToolTip.CurrentWord;
 
-            HtmlHelpInterop.DisplayIndex(0, helpPath, searchWord ?? Sci.GetAblWordAtPosition(Sci.CurrentPosition));
+            HtmlHelpInterop.DisplayIndex(0, helpPath, searchWord ?? Npp.Editor.GetAblWordAtPosition(Npp.Editor.CurrentPosition));
         }
 
         #endregion
@@ -363,7 +363,7 @@ namespace _3PA.MainFeatures.Pro {
                 }
 
                 // Notify the user, or not
-                if (Config.Instance.CompileAlwaysShowNotification || !isCurrentFile || !Sci.GetFocus() || otherFilesInError)
+                if (Config.Instance.CompileAlwaysShowNotification || !isCurrentFile || !Npp.Editor.GetFocus() || otherFilesInError)
                     UserCommunication.NotifyUnique(treatedFile.InputPath, "Was " + currentOperation.GetAttribute<CurrentOperationAttr>().ActionText + " :<br>" + ProCompilation.FormatCompilationResult(treatedFile.InputPath, errorsList, listTransferFiles), notifImg, notifTitle, notifSubtitle, null, notifTimeOut);
             } catch (Exception e) {
                 ErrorHandler.ShowErrors(e, "Error in OnExecutionOk");

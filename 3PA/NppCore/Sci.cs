@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using YamuiFramework.Helper;
@@ -42,96 +41,64 @@ namespace _3PA.NppCore {
     /// - This class also uses the direct function call to scintilla, as described in scintilla's documention. It allows<br />
     /// faster execution than with SendMessage<br />
     /// </summary>
-    internal static class Sci {
+    internal class Sci {
 
-        #region fields
+        #region Const
 
         public const int KeywordMaxLength = 60;
-        private static int _curScintillaNb;
-        private static IntPtr _curScintilla;
-        private static DocumentLines _lines;
-        private static ScintillaApi _scintillaApi;
+
+        #endregion
+        
+        #region fields
+
+        private IntPtr _handle;
+        private DocumentLines _lines;
+        private ScintillaApi _scintillaApi;
 
         #endregion
 
         #region Critical Core
 
         /// <summary>
-        /// Returns the current instance of scintilla used
-        /// 0/1 corresponding to the main/seconday scintilla currently used
+        /// Constructor
         /// </summary>
-        public static int CurrentScintillaId
-        {
-            get
-            {
-                long curScintilla;
-                Win32Api.SendMessage(Npp.HandleNpp, NppMsg.NPPM_GETCURRENTSCINTILLA, 0, out curScintilla);
-                return (int)curScintilla;
-            }
+        public Sci(IntPtr scintillaPtr) {
+            _handle = scintillaPtr;
         }
-        /// <summary>
-        /// Is scintilla currently focused?
-        /// </summary>
-        public static bool IsScintillaFocused
-        {
-            get { return WinApi.GetForegroundWindow() == HandleScintilla; }
-        }
-
-        /// <summary>
-        /// Returns the current instance of scintilla used
-        /// 0/1 corresponding to the main/seconday scintilla currently used
-        /// </summary>
-        public static int CurrentScintilla {
-            get { return _curScintillaNb; }
-        }
-
+        
         /// <summary>
         /// Gets the window handle to current Scintilla.
         /// </summary>
-        public static IntPtr HandleScintilla {
-            get {
-                if (_curScintilla == IntPtr.Zero)
-                    UpdateScintilla();
-                return _curScintilla;
-            }
+        public IntPtr Handle {
+            get { return _handle; }
         }
 
         /// <summary>
         /// Instance of scintilla, the class that allows communication with the current scintilla
         /// </summary>
-        public static ScintillaApi Api {
-            get { return _scintillaApi ?? (_scintillaApi = new ScintillaApi(HandleScintilla)); }
+        public ScintillaApi Api {
+            get { return _scintillaApi ?? (_scintillaApi = new ScintillaApi(Handle)); }
         }
 
         /// <summary>
         /// This is critical for a correct behavior when using any scintilla function that involves a position
         /// </summary>
-        private static DocumentLines Lines {
+        private DocumentLines Lines {
             get { return _lines ?? (_lines = new DocumentLines()); }
         }
 
         /// <summary>
         /// Call this to rebuild the lines information from scratch
         /// </summary>
-        public static void RebuildLinesInfo() {
+        public void RebuildLinesInfo() {
             Lines.Reset();
         }
 
         /// <summary>
         /// Call this on SCN_MODIFIED event from scintilla to update the info on lines
         /// </summary>
-        public static void UpdateLinesInfo(SCNotification scn, bool isInsertion) {
+        public void UpdateLinesInfo(SCNotification scn, bool isInsertion) {
             Lines.OnScnModified(scn, isInsertion);
-        }
-
-        /// <summary>
-        /// Updates the current scintilla handle for Npp's functions
-        /// Called when the user changes the current document
-        /// </summary>
-        public static void UpdateScintilla() {
-            _curScintillaNb = CurrentScintillaId.ClampMax(1);
-            _curScintilla = _curScintillaNb == 0 ? UnmanagedExports.NppData._scintillaMainHandle : UnmanagedExports.NppData._scintillaSecondHandle;
-            Api.UpdateScintillaDirectMessage(_curScintilla);
         }
 
         #endregion
@@ -143,16 +110,16 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public static Line GetLine(int index) {
-            return new Line(index);
+        public Line GetLine(int index) {
+            return new Line(this, index);
         }
 
         /// <summary>
         /// Returns a Line object representing the current line
         /// </summary>
         /// <returns></returns>
-        public static Line GetLine() {
-            return new Line();
+        public Line GetLine() {
+            return new Line(this);
         }
 
         /// <summary>
@@ -160,8 +127,8 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public static Selection GetSelection(int index) {
-            return new Selection(index);
+        public Selection GetSelection(int index) {
+            return new Selection(this, index);
         }
 
         /// <summary>
@@ -173,8 +140,8 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public static Marker GetMarker(int index) {
-            return new Marker(index);
+        public Marker GetMarker(int index) {
+            return new Marker(this, index);
         }
 
         /// <summary>
@@ -189,8 +156,8 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public static Margin GetMargin(int index) {
-            return new Margin(index);
+        public Margin GetMargin(int index) {
+            return new Margin(this, index);
         }
 
         /// <summary>
@@ -199,8 +166,8 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public static Indicator GetIndicator(int index) {
-            return new Indicator(index);
+        public Indicator GetIndicator(int index) {
+            return new Indicator(this, index);
         }
 
         /// <summary>
@@ -210,8 +177,8 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public static Style GetStyle(byte index) {
-            return new Style(index);
+        public Style GetStyle(byte index) {
+            return new Style(this, index);
         }
 
         #endregion
@@ -219,9 +186,16 @@ namespace _3PA.NppCore {
         #region Misc
 
         /// <summary>
+        /// Is scintilla currently focused?
+        /// </summary>
+        public bool IsScintillaFocused {
+            get { return WinApi.GetForegroundWindow() == Handle; }
+        }
+
+        /// <summary>
         /// Undo previous action
         /// </summary>
-        public static void Undo() {
+        public void Undo() {
             Api.Send(SciMsg.SCI_UNDO);
         }
 
@@ -230,7 +204,7 @@ namespace _3PA.NppCore {
         /// as several operations. Alternatively, you can use these to mark a set of operations that you do not want to have
         /// combined with the preceding or following operations if they are undone.
         /// </summary>
-        public static void BeginUndoAction() {
+        public void BeginUndoAction() {
             Api.Send(SciMsg.SCI_BEGINUNDOACTION);
         }
 
@@ -239,7 +213,7 @@ namespace _3PA.NppCore {
         /// as several operations. Alternatively, you can use these to mark a set of operations that you do not want to have
         /// combined with the preceding or following operations if they are undone.
         /// </summary>
-        public static void EndUndoAction() {
+        public void EndUndoAction() {
             Api.Send(SciMsg.SCI_ENDUNDOACTION);
         }
 
@@ -248,23 +222,23 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="chars">A String of the characters that will cancel autocompletion. The default is empty.</param>
         /// <remarks>Characters specified should be limited to printable ASCII characters.</remarks>
-        public static void AutoCStops(string chars) {
-            Win32Api.SendMessage(HandleScintilla, SciMsg.SCI_AUTOCSTOPS, 0, chars);
+        public void AutoCStops(string chars) {
+            Win32Api.SendMessage(Handle, SciMsg.SCI_AUTOCSTOPS, 0, chars);
         }
 
         /// <summary>
         /// returns a rectangle representing the location and size of the scintilla window
         /// </summary>
         /// <returns></returns>
-        public static Rectangle GetScintillaRectangle() {
-            return WinApi.GetWindowRect(HandleScintilla);
+        public Rectangle GetScintillaRectangle() {
+            return WinApi.GetWindowRect(Handle);
         }
 
         /// <summary>
         /// allows scintilla to grab focus
         /// </summary>
         /// <returns></returns>
-        public static void GrabFocus() {
+        public void GrabFocus() {
             Api.Send(SciMsg.SCI_GRABFOCUS);
         }
 
@@ -272,14 +246,14 @@ namespace _3PA.NppCore {
         /// to be tested!!!!
         /// </summary>
         /// <returns></returns>
-        public static bool GetFocus() {
+        public bool GetFocus() {
             return Api.Send(SciMsg.SCI_GETFOCUS).IsTrue();
         }
 
         /// <summary>
         /// Cancels any displayed autocompletion list.
         /// </summary>
-        public static void AutoCCancel() {
+        public void AutoCCancel() {
             Api.Send(SciMsg.SCI_AUTOCCANCEL);
         }
 
@@ -287,7 +261,7 @@ namespace _3PA.NppCore {
         /// to be tested!!!!
         /// </summary>
         /// <returns></returns>
-        public static bool AutoCActive() {
+        public bool AutoCActive() {
             return Api.Send(SciMsg.SCI_AUTOCACTIVE).IsTrue();
         }
 
@@ -295,7 +269,7 @@ namespace _3PA.NppCore {
         /// Performs the specified command
         /// </summary>
         /// <param name="sciCommand">The command to perform.</param>
-        public static void ExecuteCmd(Command sciCommand) {
+        public void ExecuteCmd(Command sciCommand) {
             Api.Send((SciMsg) sciCommand);
         }
 
@@ -303,7 +277,7 @@ namespace _3PA.NppCore {
         /// Changes all end-of-line characters in the document to the format specified.
         /// </summary>
         /// <param name="eolMode">One of the Eol enumeration values.</param>
-        public static void ConvertEols(Eol eolMode) {
+        public void ConvertEols(Eol eolMode) {
             var eol = (int) eolMode;
             Api.Send(SciMsg.SCI_CONVERTEOLS, new IntPtr(eol));
         }
@@ -311,14 +285,14 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Copies the selected text from the document and places it on the clipboard.
         /// </summary>
-        public static void Copy() {
+        public void Copy() {
             Api.Send(SciMsg.SCI_COPY);
         }
 
         /// <summary>
         /// Pastes the contents of the clipboard into the current selection.
         /// </summary>
-        public static void Paste() {
+        public void Paste() {
             Api.Send(SciMsg.SCI_PASTE);
         }
 
@@ -330,7 +304,7 @@ namespace _3PA.NppCore {
         /// If the selection is empty and the current line copied, an extra "MSDEVLineSelect" marker is added to the
         /// clipboard which is then used in Paste to paste the whole line before the current line.
         /// </remarks>
-        public static void CopyAllowLine() {
+        public void CopyAllowLine() {
             Api.Send(SciMsg.SCI_COPYALLOWLINE);
         }
 
@@ -339,7 +313,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="start">The zero-based character position in the document to start copying.</param>
         /// <param name="end">The zero-based character position (exclusive) in the document to stop copying.</param>
-        public static void CopyRange(int start, int end) {
+        public void CopyRange(int start, int end) {
             var textLength = TextLength;
             start = Clamp(start, 0, textLength);
             end = Clamp(end, 0, textLength);
@@ -354,7 +328,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Cuts the selected text from the document and places it on the clipboard.
         /// </summary>
-        public static void Cut() {
+        public void Cut() {
             Api.Send(SciMsg.SCI_CUT);
         }
 
@@ -363,7 +337,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="displayLine">The zero-based display line index.</param>
         /// <returns>The zero-based document line index.</returns>
-        public static int DocLineFromVisible(int displayLine) {
+        public int DocLineFromVisible(int displayLine) {
             displayLine = Clamp(displayLine, 0, Lines.Count);
             return Api.Send(SciMsg.SCI_DOCLINEFROMVISIBLE, new IntPtr(displayLine)).ToInt32();
         }
@@ -374,7 +348,7 @@ namespace _3PA.NppCore {
         /// <param name="style">The index of the Style to use when rendering the text to measure.</param>
         /// <param name="text">The text to measure.</param>
         /// <returns>The width in pixels.</returns>
-        public static unsafe int TextWidth(int style, string text) {
+        public unsafe int TextWidth(int style, string text) {
             style = Clamp(style, 0, 255);
             var bytes = GetBytes(text ?? String.Empty, Encoding, true);
             fixed (byte* bp = bytes)
@@ -384,7 +358,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Retrieve the height of a particular line of text in pixels.
         /// </summary>
-        public static int TextHeight(int line) {
+        public int TextHeight(int line) {
             return (int) Api.Send(SciMsg.SCI_TEXTHEIGHT, new IntPtr(line));
         }
 
@@ -392,7 +366,7 @@ namespace _3PA.NppCore {
         /// Gets or sets whether vertical scrolling ends at the last line or can scroll past.
         /// </summary>
         /// <returns>true if the maximum vertical scroll position ends at the last line; otherwise, false. The default is true.</returns>
-        public static bool EndAtLastLine {
+        public bool EndAtLastLine {
             get { return Api.Send(SciMsg.SCI_GETENDATLASTLINE).IsTrue(); }
             set { Api.Send(SciMsg.SCI_SETENDATLASTLINE, value.ToPointer()); }
         }
@@ -402,7 +376,7 @@ namespace _3PA.NppCore {
         /// the document when the user presses the Enter key.
         /// </summary>
         /// <returns>One of the Eol enumeration values. The default is Eol.CrLf.</returns>
-        public static Eol EolMode {
+        public Eol EolMode {
             get { return (Eol) Api.Send(SciMsg.SCI_GETEOLMODE); }
             set { Api.Send(SciMsg.SCI_SETEOLMODE, new IntPtr((int) value)); }
         }
@@ -410,7 +384,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Returns a string representing the current eol used
         /// </summary>
-        public static string GetEolString {
+        public string GetEolString {
             get {
                 switch (EolMode) {
                     case Eol.Cr:
@@ -430,7 +404,7 @@ namespace _3PA.NppCore {
         /// <returns>
         /// The number of screen lines which could be displayed (including any partial lines).
         /// </returns>
-        public static int LinesOnScreen {
+        public int LinesOnScreen {
             get { return Api.Send(SciMsg.SCI_LINESONSCREEN).ToInt32(); }
         }
 
@@ -439,7 +413,7 @@ namespace _3PA.NppCore {
         /// since the last call to SetSavePoint.
         /// </summary>
         /// <returns>true if the document has been modified; otherwise, false.</returns>
-        public static bool GetModify {
+        public bool GetModify {
             get { return Api.Send(SciMsg.SCI_GETMODIFY).IsTrue(); }
         }
 
@@ -451,7 +425,7 @@ namespace _3PA.NppCore {
         /// false.
         /// The default is false.
         /// </returns>
-        public static bool MouseSelectionRectangularSwitch {
+        public bool MouseSelectionRectangularSwitch {
             get { return Api.Send(SciMsg.SCI_GETMOUSESELECTIONRECTANGULARSWITCH).IsTrue(); }
             set { Api.Send(SciMsg.SCI_SETMOUSESELECTIONRECTANGULARSWITCH, value.ToPointer()); }
         }
@@ -464,7 +438,7 @@ namespace _3PA.NppCore {
         /// by calling SCI_SETMODEVENTMASK(SC_MOD_INSERTTEXT|SC_MOD_DELETETEXT).
         /// The possible notification types are of the type SciModificationMod
         /// </summary>
-        public static int EventMask {
+        public int EventMask {
             get { return Api.Send(SciMsg.SCI_GETMODEVENTMASK).ToInt32(); }
             set { Api.Send(SciMsg.SCI_SETMODEVENTMASK, new IntPtr(value)); }
         }
@@ -476,7 +450,7 @@ namespace _3PA.NppCore {
         /// true if multiple selections can be made by holding the CTRL key and dragging the mouse; otherwise, false.
         /// The default is false.
         /// </returns>
-        public static bool MultipleSelection {
+        public bool MultipleSelection {
             get { return Api.Send(SciMsg.SCI_GETMULTIPLESELECTION).IsTrue(); }
             set { Api.Send(SciMsg.SCI_SETMULTIPLESELECTION, value.ToPointer()); }
         }
@@ -485,7 +459,7 @@ namespace _3PA.NppCore {
         /// Gets or sets the behavior when pasting text into multiple selections.
         /// </summary>
         /// <returns>One of the Interop.MultiPaste enumeration values. The default is Interop.MultiPaste.Once.</returns>
-        public static MultiPaste MultiPaste {
+        public MultiPaste MultiPaste {
             get { return (MultiPaste) Api.Send(SciMsg.SCI_GETMULTIPASTE); }
             set { Api.Send(SciMsg.SCI_SETMULTIPASTE, new IntPtr((int) value)); }
         }
@@ -494,7 +468,7 @@ namespace _3PA.NppCore {
         /// Gets or sets whether to write over text rather than insert it.
         /// </summary>
         /// <return>true to write over text; otherwise, false. The default is false.</return>
-        public static bool Overtype {
+        public bool Overtype {
             get { return Api.Send(SciMsg.SCI_GETOVERTYPE).IsTrue(); }
             set { Api.Send(SciMsg.SCI_SETOVERTYPE, value.ToPointer()); }
         }
@@ -503,7 +477,7 @@ namespace _3PA.NppCore {
         /// Gets or sets whether line endings in pasted text are convereted to the document EolMode.
         /// </summary>
         /// <returns>true to convert line endings in pasted text; otherwise, false. The default is true.</returns>
-        public static bool PasteConvertEndings {
+        public bool PasteConvertEndings {
             get { return Api.Send(SciMsg.SCI_GETPASTECONVERTENDINGS).IsTrue(); }
             set { Api.Send(SciMsg.SCI_SETPASTECONVERTENDINGS, value.ToPointer()); }
         }
@@ -512,7 +486,7 @@ namespace _3PA.NppCore {
         /// Gets or sets whether the document is read-only.
         /// </summary>
         /// <returns>true if the document is read-only; otherwise, false. The default is false.</returns>
-        public static bool ReadOnly {
+        public bool ReadOnly {
             get { return Api.Send(SciMsg.SCI_GETREADONLY).IsTrue(); }
             set { Api.Send(SciMsg.SCI_SETREADONLY, value.ToPointer()); }
         }
@@ -522,7 +496,7 @@ namespace _3PA.NppCore {
         /// The time the mouse must sit still, in milliseconds, to generate a SCN_DWELLSTART notification.
         /// If set to SC_TIME_FOREVER, the default, no dwell events are generated.
         /// </summary>
-        public static int MouseDwellTime {
+        public int MouseDwellTime {
             get { return Api.Send(SciMsg.SCI_GETMOUSEDWELLTIME).ToInt32(); }
             set { Api.Send(SciMsg.SCI_SETMOUSEDWELLTIME, new IntPtr(value)); }
         }
@@ -531,7 +505,7 @@ namespace _3PA.NppCore {
         /// Gets or sets how to display whitespace characters.
         /// </summary>
         /// <returns>One of the WhitespaceMode enumeration values. The default is WhitespaceMode.Invisible.</returns>
-        public static WhitespaceMode ViewWhitespace {
+        public WhitespaceMode ViewWhitespace {
             get { return (WhitespaceMode) Api.Send(SciMsg.SCI_GETVIEWWS); }
             set { Api.Send(SciMsg.SCI_SETVIEWWS, new IntPtr((int) value)); }
         }
@@ -540,7 +514,7 @@ namespace _3PA.NppCore {
         /// Gets or sets the visibility of end-of-line characters.
         /// </summary>
         /// <returns>true to display end-of-line characters; otherwise, false. The default is false.</returns>
-        public static bool ViewEol {
+        public bool ViewEol {
             get { return Api.Send(SciMsg.SCI_GETVIEWEOL).IsTrue(); }
             set { Api.Send(SciMsg.SCI_SETVIEWEOL, value.ToPointer()); }
         }
@@ -550,7 +524,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <returns>The zoom factor measured in points.</returns>
         /// <remarks>For best results, values should range from -10 to 20 points.</remarks>
-        public static int Zoom {
+        public int Zoom {
             get { return Api.Send(SciMsg.SCI_GETZOOM).ToInt32(); }
             set { Api.Send(SciMsg.SCI_SETZOOM, new IntPtr(value)); }
         }
@@ -558,14 +532,14 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Increases the zoom factor by 1 until it reaches 20 points.
         /// </summary>
-        public static void ZoomIn() {
+        public void ZoomIn() {
             Api.Send(SciMsg.SCI_ZOOMIN);
         }
 
         /// <summary>
         /// Decreases the zoom factor by 1 until it reaches -10 points.
         /// </summary>
-        public static void ZoomOut() {
+        public void ZoomOut() {
             Api.Send(SciMsg.SCI_ZOOMOUT);
         }
 
@@ -576,7 +550,7 @@ namespace _3PA.NppCore {
         /// One of the Interop.FontQuality enumeration values.
         /// The default is Interop.FontQuality.Default.
         /// </returns>
-        public static FontQuality FontQuality {
+        public FontQuality FontQuality {
             get { return (FontQuality) Api.Send(SciMsg.SCI_GETFONTQUALITY); }
             set { Api.Send(SciMsg.SCI_SETFONTQUALITY, new IntPtr((int) value)); }
         }
@@ -588,7 +562,7 @@ namespace _3PA.NppCore {
         /// One of the WrapMode enumeration values.
         /// The default is WrapMode.None.
         /// </returns>
-        public static WrapMode WrapMode {
+        public WrapMode WrapMode {
             get { return (WrapMode) Api.Send(SciMsg.SCI_GETWRAPMODE); }
             set { Api.Send(SciMsg.SCI_SETWRAPMODE, new IntPtr((int) value)); }
         }
@@ -601,7 +575,7 @@ namespace _3PA.NppCore {
         /// Setting WrapVisualFlags to Interop.WrapVisualFlags.Start will add an
         /// additional 1 pixel to the value specified.
         /// </remarks>
-        public static int WrapStartIndent {
+        public int WrapStartIndent {
             get { return Api.Send(SciMsg.SCI_GETWRAPSTARTINDENT).ToInt32(); }
             set {
                 value = ClampMin(value, 0);
@@ -616,7 +590,7 @@ namespace _3PA.NppCore {
         /// One of the Interop.WrapIndentMode enumeration values.
         /// The default is Interop.WrapIndentMode.Fixed.
         /// </returns>
-        public static WrapIndentMode WrapIndentMode {
+        public WrapIndentMode WrapIndentMode {
             get { return (WrapIndentMode) Api.Send(SciMsg.SCI_GETWRAPINDENTMODE); }
             set { Api.Send(SciMsg.SCI_SETWRAPINDENTMODE, new IntPtr((int) value)); }
         }
@@ -628,7 +602,7 @@ namespace _3PA.NppCore {
         /// A bitwise combination of the Interop.WrapVisualFlags enumeration.
         /// The default is Interop.WrapVisualFlags.None.
         /// </returns>
-        public static WrapVisualFlags WrapVisualFlags {
+        public WrapVisualFlags WrapVisualFlags {
             get { return (WrapVisualFlags) Api.Send(SciMsg.SCI_GETWRAPVISUALFLAGS); }
             set { Api.Send(SciMsg.SCI_SETWRAPVISUALFLAGS, new IntPtr((int) value)); }
         }
@@ -640,12 +614,12 @@ namespace _3PA.NppCore {
         /// One of the Interop.WrapVisualFlagLocation enumeration values.
         /// The default is Interop.WrapVisualFlagLocation.Default.
         /// </returns>
-        public static WrapVisualFlagLocation WrapVisualFlagLocation {
+        public WrapVisualFlagLocation WrapVisualFlagLocation {
             get { return (WrapVisualFlagLocation) Api.Send(SciMsg.SCI_GETWRAPVISUALFLAGSLOCATION); }
             set { Api.Send(SciMsg.SCI_SETWRAPVISUALFLAGSLOCATION, new IntPtr((int) value)); }
         }
 
-        public static IntPtr StartRecordMacro() {
+        public IntPtr StartRecordMacro() {
             return Api.Send(SciMsg.SCI_STARTRECORD);
         }
 
@@ -661,7 +635,7 @@ namespace _3PA.NppCore {
         /// When using FoldAction.Toggle the first fold header in the document is examined to decide whether to expand or
         /// contract.
         /// </remarks>
-        public static void FoldAll(FoldAction action) {
+        public void FoldAll(FoldAction action) {
             Api.Send(SciMsg.SCI_FOLDALL, new IntPtr((int) action));
         }
 
@@ -670,7 +644,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="lineStart">The zero-based index of the line range to start hiding.</param>
         /// <param name="lineEnd">The zero-based index of the line range to end hiding.</param>
-        public static void HideLines(int lineStart, int lineEnd) {
+        public void HideLines(int lineStart, int lineEnd) {
             lineStart = Clamp(lineStart, 0, Lines.Count);
             lineEnd = Clamp(lineEnd, lineStart, Lines.Count);
 
@@ -681,7 +655,7 @@ namespace _3PA.NppCore {
         /// Gets a value indicating whether all the document lines are visible (not hidden).
         /// </summary>
         /// <returns>true if all the lines are visible; otherwise, false.</returns>
-        public static bool AllLinesVisible {
+        public bool AllLinesVisible {
             get { return Api.Send(SciMsg.SCI_GETALLLINESVISIBLE).IsTrue(); }
         }
 
@@ -690,7 +664,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <returns>The zero-based index of the first visible screen line.</returns>
         /// <remarks>The value is a visible line, not a document line.</remarks>
-        public static int FirstVisibleLine {
+        public int FirstVisibleLine {
             get { return Api.Send(SciMsg.SCI_GETFIRSTVISIBLELINE).ToInt32(); }
             set {
                 value = ClampMin(value, 0);
@@ -703,7 +677,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="lineStart">The zero-based index of the line range to start showing.</param>
         /// <param name="lineEnd">The zero-based index of the line range to end showing.</param>
-        public static void ShowLines(int lineStart, int lineEnd) {
+        public void ShowLines(int lineStart, int lineEnd) {
             lineStart = Clamp(lineStart, 0, Lines.Count);
             lineEnd = Clamp(lineEnd, lineStart, Lines.Count);
 
@@ -718,20 +692,20 @@ namespace _3PA.NppCore {
         /// Gets or sets whether to use a mixture of tabs and spaces for indentation or purely spaces.
         /// </summary>
         /// <returns>true to use tab characters; otherwise, false. The default is true.</returns>
-        public static bool UseTabs {
+        public bool UseTabs {
             get { return Api.Send(SciMsg.SCI_GETUSETABS).IsTrue(); }
-            set { Win32Api.SendMessage(HandleScintilla, SciMsg.SCI_SETUSETABS, value ? 1 : 0, 0); }
+            set { Win32Api.SendMessage(Handle, SciMsg.SCI_SETUSETABS, value ? 1 : 0, 0); }
         }
 
         /// <summary>
         /// Gets or sets the width of a tab as a multiple of a space character.
         /// </summary>
         /// <returns>The width of a tab measured in characters. The default is 4.</returns>
-        public static int TabWidth {
+        public int TabWidth {
             get { return Api.Send(SciMsg.SCI_GETTABWIDTH).ToInt32(); }
             set {
                 value = ClampMin(value, 0);
-                Win32Api.SendMessage(HandleScintilla, SciMsg.SCI_SETTABWIDTH, value, 0);
+                Win32Api.SendMessage(Handle, SciMsg.SCI_SETTABWIDTH, value, 0);
             }
         }
 
@@ -740,11 +714,11 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <returns>The indentation size measured in characters. The default is 0.</returns>
         /// <remarks> A value of 0 will make the indent width the same as the tab width.</remarks>
-        public static int IndentWidth {
+        public int IndentWidth {
             get { return Api.Send(SciMsg.SCI_GETINDENT).ToInt32(); }
             set {
                 value = ClampMin(value, 0);
-                Win32Api.SendMessage(HandleScintilla, SciMsg.SCI_SETINDENT, value, 0);
+                Win32Api.SendMessage(Handle, SciMsg.SCI_SETINDENT, value, 0);
             }
         }
 
@@ -752,7 +726,7 @@ namespace _3PA.NppCore {
         /// returns the indent value as a string, can be either a \t or a number of ' '
         /// </summary>
         /// <returns></returns>
-        public static string GetIndentString() {
+        public string GetIndentString() {
             return UseTabs ? "\t" : new string(' ', TabWidth);
         }
 
@@ -767,7 +741,7 @@ namespace _3PA.NppCore {
         /// The zero-based document position of the unmatched brace character or InvalidPosition to remove
         /// the highlight.
         /// </param>
-        public static void BraceBadLight(int position) {
+        public void BraceBadLight(int position) {
             position = Clamp(position, -1, TextLength);
             if (position > 0)
                 position = Lines.CharToBytePosition(position);
@@ -784,7 +758,7 @@ namespace _3PA.NppCore {
         /// Brace highlighting can be removed by specifying InvalidPosition for <paramref name="position1" /> and
         /// <paramref name="position2" />.
         /// </remarks>
-        public static void BraceHighlight(int position1, int position2) {
+        public void BraceHighlight(int position1, int position2) {
             var textLength = TextLength;
 
             position1 = Clamp(position1, -1, textLength);
@@ -814,7 +788,7 @@ namespace _3PA.NppCore {
         /// A match only occurs if the style of the matching brace is the same as the starting brace. Nested braces are
         /// handled correctly.
         /// </remarks>
-        public static int BraceMatch(int position) {
+        public int BraceMatch(int position) {
             position = Clamp(position, 0, TextLength);
             position = Lines.CharToBytePosition(position);
 
@@ -833,9 +807,9 @@ namespace _3PA.NppCore {
         /// Gets the current screen location of the caret.
         /// </summary>
         /// <returns><c>Point</c> representing the coordinates of the screen location.</returns>
-        public static Point GetCaretScreenLocation() {
+        public Point GetCaretScreenLocation() {
             var point = GetPointXyFromPosition(CurrentPosition);
-            Win32Api.ClientToScreen(HandleScintilla, ref point);
+            Win32Api.ClientToScreen(Handle, ref point);
             return point;
         }
 
@@ -844,7 +818,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
-        public static Point GetPointXyFromPosition(int position) {
+        public Point GetPointXyFromPosition(int position) {
             var pos = Lines.CharToBytePosition(position);
             var x = (int) Api.Send(SciMsg.SCI_POINTXFROMPOSITION, IntPtr.Zero, new IntPtr(pos));
             var y = (int) Api.Send(SciMsg.SCI_POINTYFROMPOSITION, IntPtr.Zero, new IntPtr(pos));
@@ -861,7 +835,7 @@ namespace _3PA.NppCore {
         /// The zero-based document position of the nearest character to the point specified when near a character;
         /// otherwise, -1.
         /// </returns>
-        public static int CharPositionFromPointClose(int x, int y) {
+        public int CharPositionFromPointClose(int x, int y) {
             var pos = Api.Send(SciMsg.SCI_CHARPOSITIONFROMPOINTCLOSE, new IntPtr(x), new IntPtr(y)).ToInt32();
             if (pos > -1)
                 pos = Lines.ByteToCharPosition(pos);
@@ -872,9 +846,9 @@ namespace _3PA.NppCore {
         /// Self explaining
         /// </summary>
         /// <returns></returns>
-        public static int GetPositionFromMouseLocation() {
+        public int GetPositionFromMouseLocation() {
             var point = Cursor.Position;
-            Win32Api.ScreenToClient(HandleScintilla, ref point);
+            Win32Api.ScreenToClient(Handle, ref point);
             return CharPositionFromPointClose(point.X, point.Y);
         }
 
@@ -883,7 +857,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="pos">The zero-based document character position.</param>
         /// <returns>The x-coordinate of the specified <paramref name="pos" /> within the client rectangle of the control.</returns>
-        public static int PointXFromPosition(int pos) {
+        public int PointXFromPosition(int pos) {
             pos = Clamp(pos, 0, TextLength);
             pos = Lines.CharToBytePosition(pos);
             return Api.Send(SciMsg.SCI_POINTXFROMPOSITION, IntPtr.Zero, new IntPtr(pos)).ToInt32();
@@ -894,7 +868,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="pos">The zero-based document character position.</param>
         /// <returns>The y-coordinate of the specified <paramref name="pos" /> within the client rectangle of the control.</returns>
-        public static int PointYFromPosition(int pos) {
+        public int PointYFromPosition(int pos) {
             pos = Clamp(pos, 0, TextLength);
             pos = Lines.CharToBytePosition(pos);
             return Api.Send(SciMsg.SCI_POINTYFROMPOSITION, IntPtr.Zero, new IntPtr(pos)).ToInt32();
@@ -909,7 +883,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <returns>The text displayed in the control.</returns>
         /// <remarks>Depending on the length of text get or set, this operation can be expensive.</remarks>
-        public static unsafe string Text {
+        public unsafe string Text {
             get {
                 var length = Api.Send(SciMsg.SCI_GETTEXTLENGTH).ToInt32();
                 var ptr = Api.Send(SciMsg.SCI_GETRANGEPOINTER, new IntPtr(0), new IntPtr(length));
@@ -934,7 +908,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Deletes all document text, unless the document is read-only.
         /// </summary>
-        public static void ClearAll() {
+        public void ClearAll() {
             Api.Send(SciMsg.SCI_CLEARALL);
         }
 
@@ -942,7 +916,7 @@ namespace _3PA.NppCore {
         /// Gets the selected text.
         /// </summary>
         /// <returns>The selected text if there is any; otherwise, an empty string.</returns>
-        public static unsafe string SelectedText {
+        public unsafe string SelectedText {
             get {
                 // NOTE: For some reason the length returned by this API includes the terminating NULL
                 var length = Api.Send(SciMsg.SCI_GETSELTEXT).ToInt32() - 1;
@@ -966,7 +940,7 @@ namespace _3PA.NppCore {
         /// Following the operation the caret is placed at the end of the inserted text and scrolled into view.
         /// Does nothing if string is null or empty?
         /// </remarks>
-        public static unsafe void ReplaceSelection(string text) {
+        public unsafe void ReplaceSelection(string text) {
             fixed (byte* bp = GetBytes(text ?? String.Empty, Encoding, true))
                 Api.Send(SciMsg.SCI_REPLACESEL, IntPtr.Zero, new IntPtr(bp));
         }
@@ -974,7 +948,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Removes the selected text from the document.
         /// </summary>
-        public static void Clear() {
+        public void Clear() {
             Api.Send(SciMsg.SCI_CLEAR);
         }
 
@@ -984,7 +958,7 @@ namespace _3PA.NppCore {
         /// <param name="position">The zero-based starting character position of the range to get.</param>
         /// <param name="length">The number of characters to get.</param>
         /// <returns>A string representing the text range.</returns>
-        public static string GetTextRange(int position, int length) {
+        public string GetTextRange(int position, int length) {
             var textLength = TextLength;
             position = Clamp(position, 0, textLength);
             length = Clamp(length, 0, textLength - position);
@@ -1006,7 +980,7 @@ namespace _3PA.NppCore {
         /// <param name="start">The zero-based starting character position of the range to get.</param>
         /// <param name="end">The zero-based ending character position of the range to get.</param>
         /// <returns>A string representing the text range.</returns>
-        public static string GetTextByRange(int start, int end) {
+        public string GetTextByRange(int start, int end) {
             return GetTextRange(start, end - start);
         }
 
@@ -1023,7 +997,7 @@ namespace _3PA.NppCore {
         /// <paramref name="position" /> is greater than the document length.
         /// </exception>
         /// <remarks>No scrolling is performed.</remarks>
-        public static unsafe void InsertText(int position, string text) {
+        public unsafe void InsertText(int position, string text) {
             if (position < -1)
                 position = -1;
             var textLength = TextLength;
@@ -1044,7 +1018,7 @@ namespace _3PA.NppCore {
         /// The recommended way to delete text in the document is to set the target range to be removed and replace the target
         /// with an empty string.
         /// </remarks>
-        public static unsafe int ReplaceTarget(string text) {
+        public unsafe int ReplaceTarget(string text) {
             if (text == null)
                 text = String.Empty;
             var bytes = GetBytes(text, Encoding, false);
@@ -1066,7 +1040,7 @@ namespace _3PA.NppCore {
         /// The "\0" macro will be substituted by the entire matched text from the most recent search.
         /// The TargetStart and TargetEnd properties will be updated to the start and end positions of the replaced text.
         /// </remarks>
-        public static unsafe int ReplaceTargetRe(string text) {
+        public unsafe int ReplaceTargetRe(string text) {
             var bytes = GetBytes(text ?? String.Empty, Encoding, false);
             fixed (byte* bp = bytes)
                 Api.Send(SciMsg.SCI_REPLACETARGETRE, new IntPtr(bytes.Length), new IntPtr(bp));
@@ -1077,14 +1051,14 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Deletes the given range of text
         /// </summary>
-        public static void DeleteTextByRange(int start, int end) {
+        public void DeleteTextByRange(int start, int end) {
             SetTextByRange(start, end, null);
         }
 
         /// <summary>
         /// Sets the text of a specific range, can and must be used to delete text from range
         /// </summary>
-        public static void SetTextByRange(int start, int end, string text) {
+        public void SetTextByRange(int start, int end, string text) {
             if (end < start) {
                 var buff = start;
                 start = end;
@@ -1107,10 +1081,10 @@ namespace _3PA.NppCore {
         /// <param name="offsetStart">offset relative to the current carret position</param>
         /// <param name="offsetEnd">offset relative to the current carret position</param>
         /// <param name="text"></param>
-        public static void ModifyTextAroundCaret(int offsetStart, int offsetEnd, string text) {
+        public void ModifyTextAroundCaret(int offsetStart, int offsetEnd, string text) {
             BeginUndoAction();
             // for each selection
-            for (var i = 0; i < Selection.Count; i++) {
+            for (var i = 0; i < SelectionsCount; i++) {
                 var selection = GetSelection(i);
                 var curPos = selection.Caret;
                 SetTextByRange(curPos + offsetStart, curPos + offsetEnd, text);
@@ -1128,7 +1102,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="keyword"></param>
         /// <param name="offset">offset relative to the current carret position</param>
-        public static void ReplaceKeywordWrapped(string keyword, int offset) {
+        public void ReplaceKeywordWrapped(string keyword, int offset) {
             ModifyTextAroundCaret(offset - GetKeyword(CurrentPosition + offset).Length, offset, keyword);
         }
 
@@ -1138,7 +1112,7 @@ namespace _3PA.NppCore {
         /// <param name="curPos"></param>
         /// <param name="maxLenght"></param>
         /// <returns></returns>
-        public static string GetTextOnLeftOfPos(int curPos, int maxLenght = KeywordMaxLength) {
+        public string GetTextOnLeftOfPos(int curPos, int maxLenght = KeywordMaxLength) {
             var startPos = curPos - maxLenght;
             startPos = startPos > 0 ? startPos : 0;
             return curPos - startPos > 0 ? GetTextByRange(startPos, curPos) : String.Empty;
@@ -1150,7 +1124,7 @@ namespace _3PA.NppCore {
         /// <param name="curPos"></param>
         /// <param name="maxLenght"></param>
         /// <returns></returns>
-        public static string GetTextOnRightOfPos(int curPos, int maxLenght = KeywordMaxLength) {
+        public string GetTextOnRightOfPos(int curPos, int maxLenght = KeywordMaxLength) {
             var endPos = curPos + maxLenght;
             var fullLength = TextLength;
             endPos = endPos < fullLength ? endPos : fullLength;
@@ -1162,7 +1136,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="curPos"></param>
         /// <returns></returns>
-        public static string GetKeyword(int curPos = -1) {
+        public string GetKeyword(int curPos = -1) {
             if (curPos < 0) curPos = CurrentPosition;
             return Abl.ReadAblWord(GetTextOnLeftOfPos(curPos), true);
         }
@@ -1174,7 +1148,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="curPos"></param>
         /// <returns></returns>
-        public static string GetFirstWordRightAfterPoint(int curPos) {
+        public string GetFirstWordRightAfterPoint(int curPos) {
             int nbPoints;
             var wholeWord = Abl.ReadAblWord(GetTextOnLeftOfPos(curPos), false, out nbPoints);
             switch (nbPoints) {
@@ -1191,18 +1165,18 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
-        public static string GetAblWordAtPosition(int position) {
+        public string GetAblWordAtPosition(int position) {
             return Abl.ReadAblWord(GetTextOnLeftOfPos(position), true) + Abl.ReadAblWord(GetTextOnRightOfPos(position), true, false);
         }
 
-        public static string GetTextBetween(Point point) {
+        public string GetTextBetween(Point point) {
             return GetTextByRange(point.X, point.Y);
         }
 
         /// <summary>
         /// Get document lenght (number of character!!)
         /// </summary>
-        public static int TextLength {
+        public int TextLength {
             get { return Lines.TextLength; }
         }
 
@@ -1215,7 +1189,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="start">The zero-based character position within the document to start a search or replace operation.</param>
         /// <param name="end">The zero-based character position within the document to end a search or replace operation.</param>
-        public static void SetTargetRange(int start, int end) {
+        public void SetTargetRange(int start, int end) {
             var textLength = TextLength;
             start = Clamp(start, 0, textLength);
             end = Clamp(end, 0, textLength);
@@ -1228,7 +1202,7 @@ namespace _3PA.NppCore {
         /// Gets or sets the end position used when performing a search or replace.
         /// </summary>
         /// <returns>The zero-based character position within the document to end a search or replace operation.</returns>
-        public static int TargetEnd {
+        public int TargetEnd {
             get {
                 // The position can become stale and point to a place outside of the document so we must clamp it
                 var bytePos = Clamp(Api.Send(SciMsg.SCI_GETTARGETEND).ToInt32(), 0, Api.Send(SciMsg.SCI_GETTEXTLENGTH).ToInt32());
@@ -1245,7 +1219,7 @@ namespace _3PA.NppCore {
         /// Gets or sets the start position used when performing a search or replace.
         /// </summary>
         /// <returns>The zero-based character position within the document to start a search or replace operation.</returns>
-        public static int TargetStart {
+        public int TargetStart {
             get {
                 // The position can become stale and point to a place outside of the document so we must clamp it
                 var bytePos = Clamp(Api.Send(SciMsg.SCI_GETTARGETSTART).ToInt32(), 0, Api.Send(SciMsg.SCI_GETTEXTLENGTH).ToInt32());
@@ -1261,14 +1235,14 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Sets the TargetStart and TargetEnd to the start and end positions of the selection.
         /// </summary>
-        public static void TargetFromSelection() {
+        public void TargetFromSelection() {
             Api.Send(SciMsg.SCI_TARGETFROMSELECTION);
         }
 
         /// <summary>
         /// Sets the TargetStart and TargetEnd to the start and end positions of the document.
         /// </summary>
-        public static void TargetWholeDocument() {
+        public void TargetWholeDocument() {
             Api.Send(SciMsg.SCI_TARGETWHOLEDOCUMENT);
         }
 
@@ -1276,7 +1250,7 @@ namespace _3PA.NppCore {
         /// Gets or sets the search flags used when searching text.
         /// </summary>
         /// <returns>A bitwise combination of Interop.SearchFlags values. The default is Interop.SearchFlags.None.</returns>
-        public static SearchFlags SearchFlags {
+        public SearchFlags SearchFlags {
             get { return (SearchFlags) Api.Send(SciMsg.SCI_GETSEARCHFLAGS).ToInt32(); }
             set {
                 var searchFlags = (int) value;
@@ -1289,7 +1263,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="tagNumber">The capture group (1 through 9) to get the text for.</param>
         /// <returns>A String containing the capture group text if it participated in the match; otherwise, an empty string.</returns>
-        public static unsafe string GetTag(int tagNumber) {
+        public unsafe string GetTag(int tagNumber) {
             tagNumber = Clamp(tagNumber, 1, 9);
             var length = Api.Send(SciMsg.SCI_GETTAG, new IntPtr(tagNumber), IntPtr.Zero).ToInt32();
             if (length <= 0)
@@ -1315,7 +1289,7 @@ namespace _3PA.NppCore {
         /// matched text.
         /// Searching can be performed in reverse using a TargetStart greater than the TargetEnd.
         /// </remarks>
-        public static unsafe int SearchInTarget(string text) {
+        public unsafe int SearchInTarget(string text) {
             int bytePos;
             var bytes = GetBytes(text ?? String.Empty, Encoding, false);
             fixed (byte* bp = bytes)
@@ -1339,7 +1313,7 @@ namespace _3PA.NppCore {
         /// Setting the current caret position will create a selection between it and the current AnchorPosition.
         /// The caret is not scrolled into view.
         /// </remarks>
-        public static int CurrentPosition {
+        public int CurrentPosition {
             get {
                 var bytePos = Api.Send(SciMsg.SCI_GETCURRENTPOS).ToInt32();
                 return Lines.ByteToCharPosition(bytePos);
@@ -1354,7 +1328,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Returns the current line/column in the form of a point
         /// </summary>
-        public static Point CurrentPoint {
+        public Point CurrentPoint {
             get {
                 var curPos = CurrentPosition;
                 return new Point(LineFromPosition(curPos), GetColumn(curPos));
@@ -1369,7 +1343,7 @@ namespace _3PA.NppCore {
         /// Setting the current anchor position will create a selection between it and the CurrentPosition.
         /// The caret is not scrolled into view.
         /// </remarks>
-        public static int AnchorPosition {
+        public int AnchorPosition {
             get {
                 var bytePos = Api.Send(SciMsg.SCI_GETANCHOR).ToInt32();
                 return Lines.ByteToCharPosition(bytePos);
@@ -1386,7 +1360,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="position">The zero-based document position to get the column for.</param>
         /// <returns>The number of columns from the start of the line to the specified document <paramref name="position" />.</returns>
-        public static int GetColumn(int position) {
+        public int GetColumn(int position) {
             position = Clamp(position, 0, TextLength);
             position = Lines.CharToBytePosition(position);
             return Api.Send(SciMsg.SCI_GETCOLUMN, new IntPtr(position)).ToInt32();
@@ -1397,7 +1371,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="position">The zero-based document character position.</param>
         /// <returns>The zero-based document line index containing the character <paramref name="position" />.</returns>
-        public static int LineFromPosition(int position) {
+        public int LineFromPosition(int position) {
             position = Clamp(position, 0, TextLength);
             return Lines.LineFromCharPosition(position);
         }
@@ -1409,7 +1383,7 @@ namespace _3PA.NppCore {
         /// <param name="line"></param>
         /// <param name="column"></param>
         /// <returns></returns>
-        public static int GetPosFromLineColumn(int line, int column) {
+        public int GetPosFromLineColumn(int line, int column) {
             return Lines.ByteToCharPosition(Api.Send(SciMsg.SCI_FINDCOLUMN, new IntPtr(line), new IntPtr(column)).ToInt32());
         }
 
@@ -1417,7 +1391,7 @@ namespace _3PA.NppCore {
         /// Returns the !! BYTE !! position of the start of given line
         /// Don't use THIS unless you know what you are doing with it!!!
         /// </summary>
-        public static int StartBytePosOfLine(int line) {
+        public int StartBytePosOfLine(int line) {
             return Api.Send(SciMsg.SCI_POSITIONFROMLINE, new IntPtr(line)).ToInt32();
         }
 
@@ -1429,7 +1403,7 @@ namespace _3PA.NppCore {
         /// Move the caret and the view to the specified line (lines starts 0!)
         /// </summary>
         /// <param name="line"></param>
-        public static void GoToLine(int line) {
+        public void GoToLine(int line) {
             GetLine(line).EnsureVisible();
             var linesOnScreen = LinesOnScreen;
             Api.Send(SciMsg.SCI_GOTOLINE, new IntPtr(Math.Max(line + linesOnScreen, 0)));
@@ -1443,7 +1417,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="position">The zero-based document character position to navigate to.</param>
         /// <remarks>Any selection is discarded.</remarks>
-        public static void GotoPosition(int position) {
+        public void GotoPosition(int position) {
             position = Clamp(position, 0, TextLength);
             position = Lines.CharToBytePosition(position);
             Api.Send(SciMsg.SCI_GOTOPOS, new IntPtr(position));
@@ -1452,7 +1426,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Scrolls the current position into view, if it is not already visible.
         /// </summary>
-        public static void ScrollCaret() {
+        public void ScrollCaret() {
             Api.Send(SciMsg.SCI_SCROLLCARET);
         }
 
@@ -1465,7 +1439,7 @@ namespace _3PA.NppCore {
         /// position to scroll out of view.
         /// </param>
         /// <remarks>This may be used to make a search match visible.</remarks>
-        public static void ScrollRange(int start, int end) {
+        public void ScrollRange(int start, int end) {
             var textLength = TextLength;
             start = Clamp(start, 0, textLength);
             end = Clamp(end, 0, textLength);
@@ -1486,7 +1460,7 @@ namespace _3PA.NppCore {
         /// Negative values scroll in the opposite direction.
         /// A column is the width in pixels of a space character in the Style.Default style.
         /// </remarks>
-        public static void LineScroll(int lines, int columns) {
+        public void LineScroll(int lines, int columns) {
             Api.Send(SciMsg.SCI_LINESCROLL, new IntPtr(columns), new IntPtr(lines));
         }
 
@@ -1504,7 +1478,7 @@ namespace _3PA.NppCore {
         /// <code>Math.Max(CurrentPosition, <paramref name="value" />)</code>.
         /// The caret is not scrolled into view.
         /// </remarks>
-        public static int SelectionStart {
+        public int SelectionStart {
             get {
                 var pos = Api.Send(SciMsg.SCI_GETSELECTIONSTART).ToInt32();
                 return Lines.ByteToCharPosition(pos);
@@ -1526,7 +1500,7 @@ namespace _3PA.NppCore {
         /// <code>Math.Min(AnchorPosition, <paramref name="value" />)</code>.
         /// The caret is not scrolled into view.
         /// </remarks>
-        public static int SelectionEnd {
+        public int SelectionEnd {
             get {
                 var pos = Api.Send(SciMsg.SCI_GETSELECTIONEND).ToInt32();
                 return Lines.ByteToCharPosition(pos);
@@ -1549,7 +1523,7 @@ namespace _3PA.NppCore {
         /// the same as the <paramref name="currentPos" />).
         /// The current position is scrolled into view following this operation.
         /// </remarks>
-        public static void SetSel(int anchorPos, int currentPos) {
+        public void SetSel(int anchorPos, int currentPos) {
             var textLength = TextLength;
 
             if (anchorPos >= 0) {
@@ -1569,7 +1543,7 @@ namespace _3PA.NppCore {
         /// Sets the current carret position + the current anchor position to the same position
         /// </summary>
         /// <param name="pos"></param>
-        public static void SetSel(int pos) {
+        public void SetSel(int pos) {
             SetSelection(pos, pos);
         }
 
@@ -1578,7 +1552,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="caret">The zero-based document position to end the selection.</param>
         /// <param name="anchor">The zero-based document position to start the selection.</param>
-        public static void SetSelection(int caret, int anchor) {
+        public void SetSelection(int caret, int anchor) {
             var textLength = TextLength;
 
             caret = Clamp(caret, 0, textLength);
@@ -1594,7 +1568,7 @@ namespace _3PA.NppCore {
         /// Set a single selection from anchor to caret as the ONLY selection.
         /// </summary>
         /// <param name="caret">The zero-based document position to end the selection.</param>
-        public static void SetSelection(int caret) {
+        public void SetSelection(int caret) {
             var textLength = TextLength;
             caret = Clamp(caret, 0, textLength);
             caret = Lines.CharToBytePosition(caret);
@@ -1604,7 +1578,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Moves the caret to the opposite end of the main selection.
         /// </summary>
-        public static void SwapMainAnchorCaret() {
+        public void SwapMainAnchorCaret() {
             Api.Send(SciMsg.SCI_SWAPMAINANCHORCARET);
         }
 
@@ -1612,7 +1586,7 @@ namespace _3PA.NppCore {
         /// Gets or sets the main selection when they are multiple selections.
         /// </summary>
         /// <returns>The zero-based main selection index.</returns>
-        public static int MainSelection {
+        public int MainSelection {
             get { return Api.Send(SciMsg.SCI_GETMAINSELECTION).ToInt32(); }
             set {
                 value = ClampMin(value, 0);
@@ -1628,7 +1602,7 @@ namespace _3PA.NppCore {
         /// true if typing will affect multiple selections instead of just the main selection; otherwise, false. The
         /// default is false.
         /// </returns>
-        public static bool AdditionalSelectionTyping {
+        public bool AdditionalSelectionTyping {
             get { return Api.Send(SciMsg.SCI_GETADDITIONALSELECTIONTYPING).IsTrue(); }
             set {
                 var additionalSelectionTyping = value ? new IntPtr(1) : IntPtr.Zero;
@@ -1640,14 +1614,14 @@ namespace _3PA.NppCore {
         /// Selects all the text in the document.
         /// </summary>
         /// <remarks>The current position is not scrolled into view.</remarks>
-        public static void SelectAll() {
+        public void SelectAll() {
             Api.Send(SciMsg.SCI_SELECTALL);
         }
 
         /// <summary>
         /// Sets a single empty selection at the start of the document.
         /// </summary>
-        public static void ClearSelections() {
+        public void ClearSelections() {
             Api.Send(SciMsg.SCI_CLEARSELECTIONS);
         }
 
@@ -1656,7 +1630,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="pos">The zero-based document position to place the caret at.</param>
         /// <remarks>The caret is not scrolled into view.</remarks>
-        public static void SetEmptySelection(int pos) {
+        public void SetEmptySelection(int pos) {
             pos = Clamp(pos, 0, TextLength);
             pos = Lines.CharToBytePosition(pos);
             Api.Send(SciMsg.SCI_SETEMPTYSELECTION, new IntPtr(pos));
@@ -1665,7 +1639,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Makes the next selection the main selection.
         /// </summary>
-        public static void RotateSelection() {
+        public void RotateSelection() {
             Api.Send(SciMsg.SCI_ROTATESELECTION);
         }
 
@@ -1675,7 +1649,7 @@ namespace _3PA.NppCore {
         /// <param name="caret">The zero-based document position to end the selection.</param>
         /// <param name="anchor">The zero-based document position to start the selection.</param>
         /// <remarks>A main selection must first have been set by a call to SetSelection.</remarks>
-        public static void AddSelection(int caret, int anchor) {
+        public void AddSelection(int caret, int anchor) {
             var textLength = TextLength;
             caret = Clamp(caret, 0, textLength);
             anchor = Clamp(anchor, 0, textLength);
@@ -1688,7 +1662,7 @@ namespace _3PA.NppCore {
         /// If there are multiple selections, removes the specified selection.
         /// </summary>
         /// <param name="selection">The zero-based selection index.</param>
-        public static void DropSelection(int selection) {
+        public void DropSelection(int selection) {
             selection = ClampMin(selection, 0);
             Api.Send(SciMsg.SCI_DROPSELECTIONN, new IntPtr(selection));
         }
@@ -1698,14 +1672,14 @@ namespace _3PA.NppCore {
         #region Lexer stuff
 
         // Set style 
-        private static int _stylingPosition;
-        private static int _stylingBytePosition;
+        private int _stylingPosition;
+        private int _stylingBytePosition;
 
         /// <summary>
         /// Gets or sets the current lexer.
         /// </summary>
         /// <returns>One of the Lexer enumeration values. The default is Container.</returns>
-        public static Lexer Lexer {
+        public Lexer Lexer {
             get { return (Lexer) Api.Send(SciMsg.SCI_GETLEXER); }
             set {
                 var lexer = (int) value;
@@ -1718,7 +1692,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <returns>A String representing the current lexer.</returns>
         /// <remarks>Lexer names are case-sensitive.</remarks>
-        public static unsafe string LexerLanguage {
+        public unsafe string LexerLanguage {
             get {
                 var length = Api.Send(SciMsg.SCI_GETLEXERLANGUAGE).ToInt32();
                 if (length == 0)
@@ -1747,7 +1721,7 @@ namespace _3PA.NppCore {
         /// <param name="startPos">The zero-based document position at which to start styling.</param>
         /// <param name="endPos">The zero-based document position at which to stop styling (exclusive).</param>
         /// <remarks>This will also cause fold levels in the range specified to be reset.</remarks>
-        public static void Colorize(int startPos, int endPos) {
+        public void Colorize(int startPos, int endPos) {
             var textLength = TextLength;
             startPos = Clamp(startPos, 0, textLength);
             endPos = Clamp(endPos, 0, textLength);
@@ -1771,7 +1745,7 @@ namespace _3PA.NppCore {
         /// The styling position is advanced by <paramref name="length" /> after each call allowing multiple
         /// calls to SetStyling for a single call to StartStyling.
         /// </remarks>
-        public static void SetStyling(int length, int style) {
+        public void SetStyling(int length, int style) {
             var endPos = _stylingPosition + length;
             var endBytePos = Lines.CharToBytePosition(endPos);
             Api.Send(SciMsg.SCI_SETSTYLING, new IntPtr(endBytePos - _stylingBytePosition), new IntPtr(style));
@@ -1789,7 +1763,7 @@ namespace _3PA.NppCore {
         /// After preparing the document for styling, use successive calls to SetStyling
         /// to style the document.
         /// </remarks>
-        public static void StartStyling(int position) {
+        public void StartStyling(int position) {
             position = Clamp(position, 0, TextLength);
             var pos = Lines.CharToBytePosition(position);
             Api.Send(SciMsg.SCI_STARTSTYLING, new IntPtr(pos));
@@ -1803,7 +1777,7 @@ namespace _3PA.NppCore {
         /// Returns the last document position likely to be styled correctly.
         /// </summary>
         /// <returns>The zero-based document position of the last styled character.</returns>
-        public static int GetEndStyled() {
+        public int GetEndStyled() {
             var pos = Api.Send(SciMsg.SCI_GETENDSTYLED).ToInt32();
             return Lines.ByteToCharPosition(pos);
         }
@@ -1813,7 +1787,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="position">The zero-based document position of the character to get the style for.</param>
         /// <returns>The zero-based Style index used at the specified <paramref name="position" />.</returns>
-        public static int GetStyleAt(int position) {
+        public int GetStyleAt(int position) {
             position = Clamp(position, 0, TextLength);
             position = Lines.CharToBytePosition(position);
             return Api.Send(SciMsg.SCI_GETSTYLEAT, new IntPtr(position)).ToInt32();
@@ -1826,7 +1800,7 @@ namespace _3PA.NppCore {
         /// </summary>
         /// <param name="startPos"></param>
         /// <param name="styleArray"></param>
-        public static unsafe void StyleTextEx(int startPos, byte[] styleArray) {
+        public unsafe void StyleTextEx(int startPos, byte[] styleArray) {
             // start styling from start pos
             Api.Send(SciMsg.SCI_STARTSTYLING, new IntPtr(startPos));
 
@@ -1854,28 +1828,28 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Removes all styling from the document and resets the folding state.
         /// </summary>
-        public static void ClearDocumentStyle() {
+        public void ClearDocumentStyle() {
             Api.Send(SciMsg.SCI_CLEARDOCUMENTSTYLE);
         }
 
         /// <summary>
         /// Resets all style properties to those currently configured for the Style.Default style.
         /// </summary>
-        public static void StyleClearAll() {
+        public void StyleClearAll() {
             Api.Send(SciMsg.SCI_STYLECLEARALL);
         }
 
         /// <summary>
         /// Resets the Style.Default style to its initial state.
         /// </summary>
-        public static void StyleResetDefault() {
+        public void StyleResetDefault() {
             Api.Send(SciMsg.SCI_STYLERESETDEFAULT);
         }
 
         /// <summary>
         /// The colour of the caret
         /// </summary>
-        public static Color CaretForeColor {
+        public Color CaretForeColor {
             get { return ColorTranslator.FromWin32(Api.Send(SciMsg.SCI_GETCARETFORE).ToInt32()); }
             set { Api.Send(SciMsg.SCI_STYLESETFORE, new IntPtr(ColorTranslator.ToWin32(value.IsEmpty ? Color.Black : value))); }
         }
@@ -1883,7 +1857,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Sets a global override to the selection background + foreground color.
         /// </summary>
-        public static void SetSelectionColor(bool use, Color bg, Color fg) {
+        public void SetSelectionColor(bool use, Color bg, Color fg) {
             Api.Send(SciMsg.SCI_SETSELBACK, (use && bg != Color.Transparent).ToPointer(), new IntPtr(ColorTranslator.ToWin32(bg)));
             Api.Send(SciMsg.SCI_SETSELFORE, (use && fg != Color.Transparent).ToPointer(), new IntPtr(ColorTranslator.ToWin32(fg)));
         }
@@ -1891,7 +1865,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// The selection can be drawn translucently in the selection background colour by setting an alpha value.
         /// </summary>
-        public static int SelectionBackAlpha {
+        public int SelectionBackAlpha {
             get { return Api.Send(SciMsg.SCI_GETSELALPHA).ToInt32(); }
             set { Api.Send(SciMsg.SCI_SETSELALPHA, new IntPtr(value)); }
         }
@@ -1899,7 +1873,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Sets a global override to the additional selections background + foreground color.
         /// </summary>
-        public static void SetAdditionalSelectionColor(bool use, Color bg, Color fg) {
+        public void SetAdditionalSelectionColor(bool use, Color bg, Color fg) {
             Api.Send(SciMsg.SCI_SETADDITIONALSELBACK, (use && bg != Color.Transparent).ToPointer(), new IntPtr(ColorTranslator.ToWin32(bg)));
             Api.Send(SciMsg.SCI_SETADDITIONALSELFORE, (use && fg != Color.Transparent).ToPointer(), new IntPtr(ColorTranslator.ToWin32(fg)));
         }
@@ -1907,7 +1881,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// sets the fore/background color of the whitespaces, overriding the lexer's
         /// </summary>
-        public static void SetWhiteSpaceColor(bool use, Color bg, Color fg) {
+        public void SetWhiteSpaceColor(bool use, Color bg, Color fg) {
             Api.Send(SciMsg.SCI_SETWHITESPACEBACK, (use && bg != Color.Transparent).ToPointer(), new IntPtr(ColorTranslator.ToWin32(bg)));
             Api.Send(SciMsg.SCI_SETWHITESPACEFORE, (use && fg != Color.Transparent).ToPointer(), new IntPtr(ColorTranslator.ToWin32(fg)));
         }
@@ -1915,9 +1889,9 @@ namespace _3PA.NppCore {
         /// <summary>
         /// sets the fore/background color of the IndentGuide, overriding the lexer's
         /// </summary>
-        public static void SetIndentGuideColor(Color bg, Color fg) {
+        public void SetIndentGuideColor(Color bg, Color fg) {
             // we also set the indent line color here
-            new Style(Style.IndentGuide) {
+            new Style(this, Style.IndentGuide) {
                 BackColor = bg,
                 ForeColor = fg
             };
@@ -1927,7 +1901,7 @@ namespace _3PA.NppCore {
         /// You can choose to make the background colour of the line containing the caret different with these messages
         /// See CaretLineVisible to activate
         /// </summary>
-        public static Color CaretLineBackColor {
+        public Color CaretLineBackColor {
             get { return ColorTranslator.FromWin32(Api.Send(SciMsg.SCI_GETCARETLINEBACK).ToInt32()); }
             set { Api.Send(SciMsg.SCI_SETCARETLINEBACK, new IntPtr(ColorTranslator.ToWin32(value.IsEmpty ? Color.Black : value))); }
         }
@@ -1936,7 +1910,7 @@ namespace _3PA.NppCore {
         /// You can choose to make the background colour of the line containing the caret different with these messages
         /// See CaretLineBackColor to set the color and use this to activate
         /// </summary>
-        public static bool CaretLineVisible {
+        public bool CaretLineVisible {
             get { return Api.Send(SciMsg.SCI_GETCARETLINEVISIBLE).IsTrue(); }
             set { Api.Send(SciMsg.SCI_SETCARETLINEVISIBLE, value.ToPointer()); }
         }
@@ -1948,7 +1922,7 @@ namespace _3PA.NppCore {
         /// features.
         /// Alpha goes from 0 (transparent) to 256 (opaque)
         /// </summary>
-        public static int CaretLineBackAlpha {
+        public int CaretLineBackAlpha {
             get { return Api.Send(SciMsg.SCI_GETCARETLINEBACKALPHA).ToInt32(); }
             set { Api.Send(SciMsg.SCI_SETCARETLINEBACKALPHA, new IntPtr(value)); }
         }
@@ -1956,14 +1930,14 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Set the caret color
         /// </summary>
-        public static Color CaretColor {
+        public Color CaretColor {
             set { Api.Send(SciMsg.SCI_SETCARETFORE, new IntPtr(ColorTranslator.ToWin32(value.IsEmpty ? Color.Black : value))); }
         }
 
         /// <summary>
         /// allow changing the colour of the fold margin and fold margin highlight
         /// </summary>
-        public static void SetFoldMarginColors(bool use, Color bgColor, Color fgColor) {
+        public void SetFoldMarginColors(bool use, Color bgColor, Color fgColor) {
             Api.Send(SciMsg.SCI_SETFOLDMARGINHICOLOUR, use.ToPointer(), new IntPtr(ColorTranslator.ToWin32(fgColor)));
             Api.Send(SciMsg.SCI_SETFOLDMARGINCOLOUR, use.ToPointer(), new IntPtr(ColorTranslator.ToWin32(bgColor)));
         }
@@ -1971,7 +1945,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// allow changing the colour of the fold margin and fold margin highlight
         /// </summary>
-        public static void SetFoldMarginMarkersColor(Color bgColor, Color fgColor, Color activeColor) {
+        public void SetFoldMarginMarkersColor(Color bgColor, Color fgColor, Color activeColor) {
             for (int i = 0; i < 7; i++) {
                 var marker = GetMarker(i + (int) SciMsg.SC_MARKNUM_FOLDEREND);
                 marker.SetBackColor(bgColor);
@@ -1984,7 +1958,7 @@ namespace _3PA.NppCore {
         /// While the cursor hovers over text in a style with the hotspot attribute set. Single line mode stops a hotspot from
         /// wrapping onto next line.
         /// </summary>
-        public static bool HotSpotSingleLine {
+        public bool HotSpotSingleLine {
             get { return Api.Send(SciMsg.SCI_GETHOTSPOTSINGLELINE).IsTrue(); }
             set { Api.Send(SciMsg.SCI_SETHOTSPOTSINGLELINE, value.ToPointer()); }
         }
@@ -1992,7 +1966,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// While the cursor hovers over text in a style with the hotspot attribute set, an underline can be drawn
         /// </summary>
-        public static bool HotSpotActiveUnderline {
+        public bool HotSpotActiveUnderline {
             get { return Api.Send(SciMsg.SCI_GETHOTSPOTACTIVEUNDERLINE).IsTrue(); }
             set { Api.Send(SciMsg.SCI_SETHOTSPOTACTIVEUNDERLINE, value.ToPointer()); }
         }
@@ -2000,7 +1974,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// While the cursor hovers over text in a style with the hotspot attribute set, the default colouring can be modified
         /// </summary>
-        public static void SetHotSpotActiveColor(bool use, Color fg, Color bg) {
+        public void SetHotSpotActiveColor(bool use, Color fg, Color bg) {
             Api.Send(SciMsg.SCI_SETHOTSPOTACTIVEFORE, use.ToPointer(), new IntPtr(ColorTranslator.ToWin32(fg)));
             Api.Send(SciMsg.SCI_SETHOTSPOTACTIVEBACK, use.ToPointer(), new IntPtr(ColorTranslator.ToWin32(bg)));
         }
@@ -2012,15 +1986,15 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Clear all annotations in one go
         /// </summary>
-        public static void AnnotationClearAll() {
-            Win32Api.SendMessage(HandleScintilla, SciMsg.SCI_ANNOTATIONCLEARALL, 0, 0);
+        public void AnnotationClearAll() {
+            Win32Api.SendMessage(Handle, SciMsg.SCI_ANNOTATIONCLEARALL, 0, 0);
         }
 
         /// <summary>
         /// Gets or sets the display of annotations.
         /// </summary>
         /// <returns>One of the <see cref="Annotation" /> enumeration values. The default is <see cref="Annotation.Hidden" />.</returns>
-        public static Annotation AnnotationVisible {
+        public Annotation AnnotationVisible {
             get { return (Annotation) Api.Send(SciMsg.SCI_ANNOTATIONGETVISIBLE).ToInt32(); }
             set {
                 var visible = (int) value;
@@ -2092,13 +2066,16 @@ namespace _3PA.NppCore {
         /// the first line has the index 0
         /// </summary>
         public class Line {
+
+            private Sci Sci;
+
             #region Methods
 
             /// <summary>
             /// Expands any parent folds to ensure the line is visible.
             /// </summary>
             public void EnsureVisible() {
-                Api.Send(SciMsg.SCI_ENSUREVISIBLE, new IntPtr(Index));
+                Sci.Api.Send(SciMsg.SCI_ENSUREVISIBLE, new IntPtr(Index));
             }
 
             //public void ExpandChildren(int level)
@@ -2110,7 +2087,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <param name="action">One of the FoldAction enumeration values.</param>
             public void FoldChildren(FoldAction action) {
-                Api.Send(SciMsg.SCI_FOLDCHILDREN, new IntPtr(Index), new IntPtr((int) action));
+                Sci.Api.Send(SciMsg.SCI_FOLDCHILDREN, new IntPtr(Index), new IntPtr((int) action));
             }
 
             /// <summary>
@@ -2118,7 +2095,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <param name="action">One of the FoldAction enumeration values.</param>
             public void FoldLine(FoldAction action) {
-                Api.Send(SciMsg.SCI_FOLDLINE, new IntPtr(Index), new IntPtr((int) action));
+                Sci.Api.Send(SciMsg.SCI_FOLDLINE, new IntPtr(Index), new IntPtr((int) action));
             }
 
             /// <summary>
@@ -2132,7 +2109,7 @@ namespace _3PA.NppCore {
             /// index returned is the last line that would be made visible or hidden by toggling the fold state.
             /// </returns>
             public int GetLastChild(int level) {
-                return Api.Send(SciMsg.SCI_GETLASTCHILD, new IntPtr(Index), new IntPtr(level)).ToInt32();
+                return Sci.Api.Send(SciMsg.SCI_GETLASTCHILD, new IntPtr(Index), new IntPtr(level)).ToInt32();
             }
 
             /// <summary>
@@ -2140,7 +2117,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <remarks>Any selection is discarded.</remarks>
             public void Goto() {
-                Api.Send(SciMsg.SCI_GOTOLINE, new IntPtr(Index));
+                Sci.Api.Send(SciMsg.SCI_GOTOLINE, new IntPtr(Index));
             }
 
             /// <summary>
@@ -2150,7 +2127,7 @@ namespace _3PA.NppCore {
             /// <returns>A MarkerHandle which can be used to track the line.</returns>
             /// <remarks>This method does not check if the line already contains the <paramref name="marker" />.</remarks>
             public MarkerHandle MarkerAdd(int marker) {
-                var handle = Api.Send(SciMsg.SCI_MARKERADD, new IntPtr(Index), new IntPtr(marker));
+                var handle = Sci.Api.Send(SciMsg.SCI_MARKERADD, new IntPtr(Index), new IntPtr(marker));
                 return new MarkerHandle {Value = handle};
             }
 
@@ -2163,7 +2140,7 @@ namespace _3PA.NppCore {
             /// </param>
             public void MarkerAddSet(uint markerMask) {
                 var mask = unchecked((int) markerMask);
-                Api.Send(SciMsg.SCI_MARKERADDSET, new IntPtr(Index), new IntPtr(mask));
+                Sci.Api.Send(SciMsg.SCI_MARKERADDSET, new IntPtr(Index), new IntPtr(mask));
             }
 
             /// <summary>
@@ -2175,7 +2152,7 @@ namespace _3PA.NppCore {
             /// </param>
             /// <remarks>If the same marker has been added to the line more than once, this will delete one copy each time it is used.</remarks>
             public void MarkerDelete(int marker) {
-                Api.Send(SciMsg.SCI_MARKERDELETE, new IntPtr(Index), new IntPtr(marker));
+                Sci.Api.Send(SciMsg.SCI_MARKERDELETE, new IntPtr(Index), new IntPtr(marker));
             }
 
             /// <summary>
@@ -2183,7 +2160,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>An unsigned 32-bit value with each bit cooresponding to one of the 32 zero-based Margin indexes.</returns>
             public uint MarkerGet() {
-                var mask = Api.Send(SciMsg.SCI_MARKERGET, new IntPtr(Index)).ToInt32();
+                var mask = Sci.Api.Send(SciMsg.SCI_MARKERGET, new IntPtr(Index)).ToInt32();
                 return unchecked((uint) mask);
             }
 
@@ -2201,7 +2178,7 @@ namespace _3PA.NppCore {
             /// <remarks>For example, the mask for marker index 10 is 1 shifted left 10 times (1 &lt;&lt; 10).</remarks>
             public int MarkerNext(uint markerMask) {
                 var mask = unchecked((int) markerMask);
-                return Api.Send(SciMsg.SCI_MARKERNEXT, new IntPtr(Index), new IntPtr(mask)).ToInt32();
+                return Sci.Api.Send(SciMsg.SCI_MARKERNEXT, new IntPtr(Index), new IntPtr(mask)).ToInt32();
             }
 
             /// <summary>
@@ -2218,7 +2195,7 @@ namespace _3PA.NppCore {
             /// <remarks>For example, the mask for marker index 10 is 1 shifted left 10 times (1 &lt;&lt; 10).</remarks>
             public int MarkerPrevious(uint markerMask) {
                 var mask = unchecked((int) markerMask);
-                return Api.Send(SciMsg.SCI_MARKERPREVIOUS, new IntPtr(Index), new IntPtr(mask)).ToInt32();
+                return Sci.Api.Send(SciMsg.SCI_MARKERPREVIOUS, new IntPtr(Index), new IntPtr(mask)).ToInt32();
             }
 
             /// <summary>
@@ -2226,7 +2203,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <remarks>The line must be set as a FoldLevelFlags.Header.</remarks>
             public void ToggleFold() {
-                Api.Send(SciMsg.SCI_TOGGLEFOLD, new IntPtr(Index));
+                Sci.Api.Send(SciMsg.SCI_TOGGLEFOLD, new IntPtr(Index));
             }
 
             #endregion Methods
@@ -2238,7 +2215,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>The number of annotation lines.</returns>
             public int AnnotationLines {
-                get { return Api.Send(SciMsg.SCI_ANNOTATIONGETLINES, new IntPtr(Index)).ToInt32(); }
+                get { return Sci.Api.Send(SciMsg.SCI_ANNOTATIONGETLINES, new IntPtr(Index)).ToInt32(); }
             }
 
             /// <summary>
@@ -2249,8 +2226,8 @@ namespace _3PA.NppCore {
             /// has been used to set individual character styles.
             /// </returns>
             public int AnnotationStyle {
-                get { return Api.Send(SciMsg.SCI_ANNOTATIONGETSTYLE, new IntPtr(Index)).ToInt32(); }
-                set { Api.Send(SciMsg.SCI_ANNOTATIONSETSTYLE, new IntPtr(Index), new IntPtr(value)); }
+                get { return Sci.Api.Send(SciMsg.SCI_ANNOTATIONGETSTYLE, new IntPtr(Index)).ToInt32(); }
+                set { Sci.Api.Send(SciMsg.SCI_ANNOTATIONSETSTYLE, new IntPtr(Index), new IntPtr(value)); }
             }
 
             /// <summary>
@@ -2268,7 +2245,7 @@ namespace _3PA.NppCore {
             /// </remarks>
             public unsafe byte[] AnnotationStyles {
                 get {
-                    var length = Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index)).ToInt32();
+                    var length = Sci.Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index)).ToInt32();
                     if (length == 0)
                         return new byte[0];
 
@@ -2277,24 +2254,24 @@ namespace _3PA.NppCore {
 
                     fixed (byte* textPtr = text)
                     fixed (byte* stylePtr = styles) {
-                        Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index), new IntPtr(textPtr));
-                        Api.Send(SciMsg.SCI_ANNOTATIONGETSTYLES, new IntPtr(Index), new IntPtr(stylePtr));
+                        Sci.Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index), new IntPtr(textPtr));
+                        Sci.Api.Send(SciMsg.SCI_ANNOTATIONGETSTYLES, new IntPtr(Index), new IntPtr(stylePtr));
 
-                        return ByteToCharStyles(stylePtr, textPtr, length, Encoding);
+                        return ByteToCharStyles(stylePtr, textPtr, length, Sci.Encoding);
                     }
                 }
                 set {
-                    var length = Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index)).ToInt32();
+                    var length = Sci.Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index)).ToInt32();
                     if (length == 0)
                         return;
 
                     var text = new byte[length + 1];
                     fixed (byte* textPtr = text) {
-                        Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index), new IntPtr(textPtr));
+                        Sci.Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index), new IntPtr(textPtr));
 
-                        var styles = CharToByteStyles(value ?? new byte[0], textPtr, length, Encoding);
+                        var styles = CharToByteStyles(value ?? new byte[0], textPtr, length, Sci.Encoding);
                         fixed (byte* stylePtr = styles)
-                            Api.Send(SciMsg.SCI_ANNOTATIONSETSTYLES, new IntPtr(Index), new IntPtr(stylePtr));
+                            Sci.Api.Send(SciMsg.SCI_ANNOTATIONSETSTYLES, new IntPtr(Index), new IntPtr(stylePtr));
                     }
                 }
             }
@@ -2305,23 +2282,23 @@ namespace _3PA.NppCore {
             /// <returns>A String representing the line annotation text.</returns>
             public unsafe string AnnotationText {
                 get {
-                    var length = Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index)).ToInt32();
+                    var length = Sci.Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index)).ToInt32();
                     if (length == 0)
                         return String.Empty;
 
                     var bytes = new byte[length + 1];
                     fixed (byte* bp = bytes) {
-                        Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index), new IntPtr(bp));
-                        return GetString(new IntPtr(bp), length, Encoding);
+                        Sci.Api.Send(SciMsg.SCI_ANNOTATIONGETTEXT, new IntPtr(Index), new IntPtr(bp));
+                        return GetString(new IntPtr(bp), length, Sci.Encoding);
                     }
                 }
                 set {
                     if (String.IsNullOrEmpty(value)) {
-                        Win32Api.SendMessage(HandleScintilla, SciMsg.SCI_ANNOTATIONSETTEXT, Index, null);
+                        Win32Api.SendMessage(Sci.Handle, SciMsg.SCI_ANNOTATIONSETTEXT, Index, null);
                     } else {
-                        var bytes = GetBytes(value, Encoding, true);
+                        var bytes = GetBytes(value, Sci.Encoding, true);
                         fixed (byte* bp = bytes)
-                            Api.Send(SciMsg.SCI_ANNOTATIONSETTEXT, new IntPtr(Index), new IntPtr(bp));
+                            Sci.Api.Send(SciMsg.SCI_ANNOTATIONSETTEXT, new IntPtr(Index), new IntPtr(bp));
                     }
                 }
             }
@@ -2332,7 +2309,7 @@ namespace _3PA.NppCore {
             /// <returns>The zero-based line index of the next contracted folder header.</returns>
             /// <remarks>If the current line is contracted the current line index is returned.</remarks>
             public int ContractedFoldNext {
-                get { return Api.Send(SciMsg.SCI_CONTRACTEDFOLDNEXT, new IntPtr(Index)).ToInt32(); }
+                get { return Sci.Api.Send(SciMsg.SCI_CONTRACTEDFOLDNEXT, new IntPtr(Index)).ToInt32(); }
             }
 
             /// <summary>
@@ -2341,7 +2318,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>The zero-based display line index.</returns>
             public int DisplayIndex {
-                get { return Api.Send(SciMsg.SCI_VISIBLEFROMDOCLINE, new IntPtr(Index)).ToInt32(); }
+                get { return Sci.Api.Send(SciMsg.SCI_VISIBLEFROMDOCLINE, new IntPtr(Index)).ToInt32(); }
             }
 
             /// <summary>
@@ -2349,7 +2326,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>The equivalent of Position + Length.</returns>
             public int EndPosition {
-                get { return Lines.ByteToCharPosition(Api.Send(SciMsg.SCI_GETLINEENDPOSITION, new IntPtr(Index)).ToInt32()); }
+                get { return Sci.Lines.ByteToCharPosition(Sci.Api.Send(SciMsg.SCI_GETLINEENDPOSITION, new IntPtr(Index)).ToInt32()); }
             }
 
             /// <summary>
@@ -2369,10 +2346,10 @@ namespace _3PA.NppCore {
             /// This property is useful for toggling the state of many folds without updating the display until finished.
             /// </remarks>
             public bool Expanded {
-                get { return Api.Send(SciMsg.SCI_GETFOLDEXPANDED, new IntPtr(Index)) != IntPtr.Zero; }
+                get { return Sci.Api.Send(SciMsg.SCI_GETFOLDEXPANDED, new IntPtr(Index)) != IntPtr.Zero; }
                 set {
                     var expanded = value ? new IntPtr(1) : IntPtr.Zero;
-                    Api.Send(SciMsg.SCI_SETFOLDEXPANDED, new IntPtr(Index), expanded);
+                    Sci.Api.Send(SciMsg.SCI_SETFOLDEXPANDED, new IntPtr(Index), expanded);
                 }
             }
 
@@ -2382,14 +2359,14 @@ namespace _3PA.NppCore {
             /// <returns>The fold level ranging from 0 to 4095. The default is 1024.</returns>
             public int FoldLevel {
                 get {
-                    var level = Api.Send(SciMsg.SCI_GETFOLDLEVEL, new IntPtr(Index)).ToInt32();
+                    var level = Sci.Api.Send(SciMsg.SCI_GETFOLDLEVEL, new IntPtr(Index)).ToInt32();
                     return level & (int) SciMsg.SC_FOLDLEVELNUMBERMASK;
                 }
                 set {
                     var bits = (int) FoldLevelFlags;
                     bits |= value;
 
-                    Api.Send(SciMsg.SCI_SETFOLDLEVEL, new IntPtr(Index), new IntPtr(bits));
+                    Sci.Api.Send(SciMsg.SCI_SETFOLDLEVEL, new IntPtr(Index), new IntPtr(bits));
                 }
             }
 
@@ -2399,14 +2376,14 @@ namespace _3PA.NppCore {
             /// <returns>A bitwise combination of the FoldLevelFlags enumeration.</returns>
             public FoldLevelFlags FoldLevelFlags {
                 get {
-                    var flags = Api.Send(SciMsg.SCI_GETFOLDLEVEL, new IntPtr(Index)).ToInt32();
+                    var flags = Sci.Api.Send(SciMsg.SCI_GETFOLDLEVEL, new IntPtr(Index)).ToInt32();
                     return (FoldLevelFlags) (flags & ~(int) SciMsg.SC_FOLDLEVELNUMBERMASK);
                 }
                 set {
                     var bits = FoldLevel;
                     bits |= (int) value;
 
-                    Api.Send(SciMsg.SCI_SETFOLDLEVEL, new IntPtr(Index), new IntPtr(bits));
+                    Sci.Api.Send(SciMsg.SCI_SETFOLDLEVEL, new IntPtr(Index), new IntPtr(bits));
                 }
             }
 
@@ -2416,7 +2393,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>The zero-based line index of the fold parent if present; otherwise, -1.</returns>
             public int FoldParent {
-                get { return Api.Send(SciMsg.SCI_GETFOLDPARENT, new IntPtr(Index)).ToInt32(); }
+                get { return Sci.Api.Send(SciMsg.SCI_GETFOLDPARENT, new IntPtr(Index)).ToInt32(); }
             }
 
             /// <summary>
@@ -2430,7 +2407,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>The number of characters in the line including any end of line characters.</returns>
             public int Length {
-                get { return Lines.LineCharLength(Index); }
+                get { return Sci.Lines.LineCharLength(Index); }
             }
 
             /// <summary>
@@ -2441,8 +2418,8 @@ namespace _3PA.NppCore {
             /// has been used to set individual character styles.
             /// </returns>
             public int MarginStyle {
-                get { return Api.Send(SciMsg.SCI_MARGINGETSTYLE, new IntPtr(Index)).ToInt32(); }
-                set { Api.Send(SciMsg.SCI_MARGINSETSTYLE, new IntPtr(Index), new IntPtr(value)); }
+                get { return Sci.Api.Send(SciMsg.SCI_MARGINGETSTYLE, new IntPtr(Index)).ToInt32(); }
+                set { Sci.Api.Send(SciMsg.SCI_MARGINSETSTYLE, new IntPtr(Index), new IntPtr(value)); }
             }
 
             /// <summary>
@@ -2460,7 +2437,7 @@ namespace _3PA.NppCore {
             /// </remarks>
             public unsafe byte[] MarginStyles {
                 get {
-                    var length = Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index)).ToInt32();
+                    var length = Sci.Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index)).ToInt32();
                     if (length == 0)
                         return new byte[0];
 
@@ -2469,24 +2446,24 @@ namespace _3PA.NppCore {
 
                     fixed (byte* textPtr = text)
                     fixed (byte* stylePtr = styles) {
-                        Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index), new IntPtr(textPtr));
-                        Api.Send(SciMsg.SCI_MARGINGETSTYLES, new IntPtr(Index), new IntPtr(stylePtr));
+                        Sci.Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index), new IntPtr(textPtr));
+                        Sci.Api.Send(SciMsg.SCI_MARGINGETSTYLES, new IntPtr(Index), new IntPtr(stylePtr));
 
-                        return ByteToCharStyles(stylePtr, textPtr, length, Encoding);
+                        return ByteToCharStyles(stylePtr, textPtr, length, Sci.Encoding);
                     }
                 }
                 set {
-                    var length = Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index)).ToInt32();
+                    var length = Sci.Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index)).ToInt32();
                     if (length == 0)
                         return;
 
                     var text = new byte[length + 1];
                     fixed (byte* textPtr = text) {
-                        Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index), new IntPtr(textPtr));
+                        Sci.Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index), new IntPtr(textPtr));
 
-                        var styles = CharToByteStyles(value ?? new byte[0], textPtr, length, Encoding);
+                        var styles = CharToByteStyles(value ?? new byte[0], textPtr, length, Sci.Encoding);
                         fixed (byte* stylePtr = styles)
-                            Api.Send(SciMsg.SCI_MARGINSETSTYLES, new IntPtr(Index), new IntPtr(stylePtr));
+                            Sci.Api.Send(SciMsg.SCI_MARGINSETSTYLES, new IntPtr(Index), new IntPtr(stylePtr));
                     }
                 }
             }
@@ -2498,24 +2475,24 @@ namespace _3PA.NppCore {
             /// <returns>The text displayed in the line margin.</returns>
             public unsafe string MarginText {
                 get {
-                    var length = Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index)).ToInt32();
+                    var length = Sci.Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index)).ToInt32();
                     if (length == 0)
                         return String.Empty;
 
                     var bytes = new byte[length + 1];
                     fixed (byte* bp = bytes) {
-                        Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index), new IntPtr(bp));
-                        return GetString(new IntPtr(bp), length, Encoding);
+                        Sci.Api.Send(SciMsg.SCI_MARGINGETTEXT, new IntPtr(Index), new IntPtr(bp));
+                        return GetString(new IntPtr(bp), length, Sci.Encoding);
                     }
                 }
                 set {
                     if (String.IsNullOrEmpty(value)) {
                         // Scintilla docs suggest that setting to NULL rather than an empty string will free memory
-                        Api.Send(SciMsg.SCI_MARGINSETTEXT, new IntPtr(Index), IntPtr.Zero);
+                        Sci.Api.Send(SciMsg.SCI_MARGINSETTEXT, new IntPtr(Index), IntPtr.Zero);
                     } else {
-                        var bytes = GetBytes(value, Encoding, true);
+                        var bytes = GetBytes(value, Sci.Encoding, true);
                         fixed (byte* bp = bytes)
-                            Api.Send(SciMsg.SCI_MARGINSETTEXT, new IntPtr(Index), new IntPtr(bp));
+                            Sci.Api.Send(SciMsg.SCI_MARGINSETTEXT, new IntPtr(Index), new IntPtr(bp));
                     }
                 }
             }
@@ -2525,7 +2502,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>The document position of the first character in the line.</returns>
             public int Position {
-                get { return Lines.CharPositionFromLine(Index); }
+                get { return Sci.Lines.CharPositionFromLine(Index); }
             }
 
             /// <summary>
@@ -2535,13 +2512,13 @@ namespace _3PA.NppCore {
             /// <remarks>The returned text includes any end of line characters.</remarks>
             public unsafe string Text {
                 get {
-                    var start = Api.Send(SciMsg.SCI_POSITIONFROMLINE, new IntPtr(Index));
-                    var length = Api.Send(SciMsg.SCI_LINELENGTH, new IntPtr(Index));
-                    var ptr = Api.Send(SciMsg.SCI_GETRANGEPOINTER, start, length);
+                    var start = Sci.Api.Send(SciMsg.SCI_POSITIONFROMLINE, new IntPtr(Index));
+                    var length = Sci.Api.Send(SciMsg.SCI_LINELENGTH, new IntPtr(Index));
+                    var ptr = Sci.Api.Send(SciMsg.SCI_GETRANGEPOINTER, start, length);
                     if (ptr == IntPtr.Zero)
                         return String.Empty;
 
-                    var text = new string((sbyte*) ptr, 0, length.ToInt32(), Encoding);
+                    var text = new string((sbyte*)ptr, 0, length.ToInt32(), Sci.Encoding);
                     return text;
                 }
             }
@@ -2551,15 +2528,15 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>The indentation measured in character columns, which corresponds to the width of space characters.</returns>
             public int Indentation {
-                get { return Api.Send(SciMsg.SCI_GETLINEINDENTATION, new IntPtr(Index)).ToInt32(); }
-                set { Api.Send(SciMsg.SCI_SETLINEINDENTATION, new IntPtr(Index), new IntPtr(value)); }
+                get { return Sci.Api.Send(SciMsg.SCI_GETLINEINDENTATION, new IntPtr(Index)).ToInt32(); }
+                set { Sci.Api.Send(SciMsg.SCI_SETLINEINDENTATION, new IntPtr(Index), new IntPtr(value)); }
             }
 
             /// <summary>
             /// This returns the position at the end of indentation of a line
             /// </summary>
             public int IndentationPosition {
-                get { return Lines.ByteToCharPosition(Api.Send(SciMsg.SCI_GETLINEINDENTPOSITION, new IntPtr(Index)).ToInt32()); }
+                get { return Sci.Lines.ByteToCharPosition(Sci.Api.Send(SciMsg.SCI_GETLINEINDENTPOSITION, new IntPtr(Index)).ToInt32()); }
             }
 
             /// <summary>
@@ -2567,7 +2544,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>true if the line is visible; otherwise, false.</returns>
             public bool Visible {
-                get { return Api.Send(SciMsg.SCI_GETLINEVISIBLE, new IntPtr(Index)) != IntPtr.Zero; }
+                get { return Sci.Api.Send(SciMsg.SCI_GETLINEVISIBLE, new IntPtr(Index)) != IntPtr.Zero; }
             }
 
             /// <summary>
@@ -2575,7 +2552,7 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>The number of display lines needed to wrap the current document line.</returns>
             public int WrapCount {
-                get { return Api.Send(SciMsg.SCI_WRAPCOUNT, new IntPtr(Index)).ToInt32(); }
+                get { return Sci.Api.Send(SciMsg.SCI_WRAPCOUNT, new IntPtr(Index)).ToInt32(); }
             }
 
             #endregion Properties
@@ -2586,44 +2563,46 @@ namespace _3PA.NppCore {
             /// Initializes a new instance of the Line class.
             /// </summary>
             /// <param name="index">The index of this line within the LineCollection that created it.</param>
-            public Line(int index) {
-                index = Clamp(index, 0, Count);
+            public Line(Sci scintilla, int index) {
+                Sci = scintilla;
+                index = Clamp(index, 0, Sci.LinesCount);
                 Index = index;
             }
 
             /// <summary>
             /// New line objetc for the current line
             /// </summary>
-            public Line() {
-                Index = CurrentLine;
+            public Line(Sci scintilla) {
+                Sci = scintilla;
+                Index = Sci.CurrentLine;
             }
 
             #endregion Constructors
-
-            #region static
-
-            /// <summary>
-            /// Gets the current line index.
-            /// </summary>
-            /// <returns>The zero-based line index containing the CurrentPosition.</returns>
-            public static int CurrentLine {
-                get {
-                    var currentPos = Api.Send(SciMsg.SCI_GETCURRENTPOS).ToInt32();
-                    var line = Api.Send(SciMsg.SCI_LINEFROMPOSITION, new IntPtr(currentPos)).ToInt32();
-                    return line;
-                }
-            }
-
-            /// <summary>
-            /// Get the total number of lines
-            /// An empty document has 1 line, a document with only one \n has 2 lines
-            /// </summary>
-            public static int Count {
-                get { return Lines.Count; }
-            }
-
-            #endregion
         }
+
+        #region static
+
+        /// <summary>
+        /// Gets the current line index.
+        /// </summary>
+        /// <returns>The zero-based line index containing the CurrentPosition.</returns>
+        public int CurrentLine {
+            get {
+                var currentPos = Api.Send(SciMsg.SCI_GETCURRENTPOS).ToInt32();
+                var line = Api.Send(SciMsg.SCI_LINEFROMPOSITION, new IntPtr(currentPos)).ToInt32();
+                return line;
+            }
+        }
+
+        /// <summary>
+        /// Get the total number of lines
+        /// An empty document has 1 line, a document with only one \n has 2 lines
+        /// </summary>
+        public int LinesCount {
+            get { return Lines.Count; }
+        }
+
+        #endregion
 
         #endregion
 
@@ -2633,6 +2612,9 @@ namespace _3PA.NppCore {
         /// Represents a selection when there are multiple active selections in a Scintilla control.
         /// </summary>
         public class Selection {
+
+            private Sci Sci;
+
             /// <summary>
             /// Sets both anchor and caret position to the same position
             /// </summary>
@@ -2648,16 +2630,16 @@ namespace _3PA.NppCore {
             /// <returns>The zero-based document position of the selection anchor.</returns>
             public int Anchor {
                 get {
-                    var pos = Api.Send(SciMsg.SCI_GETSELECTIONNANCHOR, new IntPtr(Index)).ToInt32();
+                    var pos = Sci.Api.Send(SciMsg.SCI_GETSELECTIONNANCHOR, new IntPtr(Index)).ToInt32();
                     if (pos <= 0)
                         return pos;
 
-                    return Lines.ByteToCharPosition(pos);
+                    return Sci.Lines.ByteToCharPosition(pos);
                 }
                 set {
-                    value = Clamp(value, 0, TextLength);
-                    value = Lines.CharToBytePosition(value);
-                    Api.Send(SciMsg.SCI_SETSELECTIONNANCHOR, new IntPtr(Index), new IntPtr(value));
+                    value = Clamp(value, 0, Sci.TextLength);
+                    value = Sci.Lines.CharToBytePosition(value);
+                    Sci.Api.Send(SciMsg.SCI_SETSELECTIONNANCHOR, new IntPtr(Index), new IntPtr(value));
                 }
             }
 
@@ -2666,10 +2648,10 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>The amount of virtual space past the end of the line offsetting the selection anchor.</returns>
             public int AnchorVirtualSpace {
-                get { return Api.Send(SciMsg.SCI_GETSELECTIONNANCHORVIRTUALSPACE, new IntPtr(Index)).ToInt32(); }
+                get { return Sci.Api.Send(SciMsg.SCI_GETSELECTIONNANCHORVIRTUALSPACE, new IntPtr(Index)).ToInt32(); }
                 set {
                     value = ClampMin(value, 0);
-                    Api.Send(SciMsg.SCI_SETSELECTIONNANCHORVIRTUALSPACE, new IntPtr(Index), new IntPtr(value));
+                    Sci.Api.Send(SciMsg.SCI_SETSELECTIONNANCHORVIRTUALSPACE, new IntPtr(Index), new IntPtr(value));
                 }
             }
 
@@ -2679,16 +2661,16 @@ namespace _3PA.NppCore {
             /// <returns>The zero-based document position of the selection caret.</returns>
             public int Caret {
                 get {
-                    var pos = Api.Send(SciMsg.SCI_GETSELECTIONNCARET, new IntPtr(Index)).ToInt32();
+                    var pos = Sci.Api.Send(SciMsg.SCI_GETSELECTIONNCARET, new IntPtr(Index)).ToInt32();
                     if (pos <= 0)
                         return pos;
 
-                    return Lines.ByteToCharPosition(pos);
+                    return Sci.Lines.ByteToCharPosition(pos);
                 }
                 set {
-                    value = Clamp(value, 0, TextLength);
-                    value = Lines.CharToBytePosition(value);
-                    Api.Send(SciMsg.SCI_SETSELECTIONNCARET, new IntPtr(Index), new IntPtr(value));
+                    value = Clamp(value, 0, Sci.TextLength);
+                    value = Sci.Lines.CharToBytePosition(value);
+                    Sci.Api.Send(SciMsg.SCI_SETSELECTIONNCARET, new IntPtr(Index), new IntPtr(value));
                 }
             }
 
@@ -2697,10 +2679,10 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>The amount of virtual space past the end of the line offsetting the selection caret.</returns>
             public int CaretVirtualSpace {
-                get { return Api.Send(SciMsg.SCI_GETSELECTIONNCARETVIRTUALSPACE, new IntPtr(Index)).ToInt32(); }
+                get { return Sci.Api.Send(SciMsg.SCI_GETSELECTIONNCARETVIRTUALSPACE, new IntPtr(Index)).ToInt32(); }
                 set {
                     value = ClampMin(value, 0);
-                    Api.Send(SciMsg.SCI_SETSELECTIONNCARETVIRTUALSPACE, new IntPtr(Index), new IntPtr(value));
+                    Sci.Api.Send(SciMsg.SCI_SETSELECTIONNCARETVIRTUALSPACE, new IntPtr(Index), new IntPtr(value));
                 }
             }
 
@@ -2750,30 +2732,31 @@ namespace _3PA.NppCore {
             /// Initializes a new instance of the Selection class.
             /// </summary>
             /// <param name="index">The index of this selection within the SelectionCollection that created it.</param>
-            public Selection(int index) {
+            public Selection(Sci scintilla, int index) {
+                Sci = scintilla;
                 Index = index;
             }
-
-            #region static
-
-            /// <summary>
-            /// Gets the number of active selections.
-            /// </summary>
-            /// <returns>The number of selections in the SelectionCollection.</returns>
-            public static int Count {
-                get { return Api.Send(SciMsg.SCI_GETSELECTIONS).ToInt32(); }
-            }
-
-            /// <summary>
-            /// Gets a value indicating whether all selection ranges are empty.
-            /// </summary>
-            /// <returns>true if all selection ranges are empty; otherwise, false.</returns>
-            public static bool IsEmpty {
-                get { return Api.Send(SciMsg.SCI_GETSELECTIONEMPTY) != IntPtr.Zero; }
-            }
-
-            #endregion
         }
+
+        #region static
+
+        /// <summary>
+        /// Gets the number of active selections.
+        /// </summary>
+        /// <returns>The number of selections in the SelectionCollection.</returns>
+        public int SelectionsCount {
+            get { return Api.Send(SciMsg.SCI_GETSELECTIONS).ToInt32(); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether all selection ranges are empty.
+        /// </summary>
+        /// <returns>true if all selection ranges are empty; otherwise, false.</returns>
+        public bool SelectionIsEmpty {
+            get { return Api.Send(SciMsg.SCI_GETSELECTIONEMPTY) != IntPtr.Zero; }
+        }
+
+        #endregion
 
         #endregion
 
@@ -2783,6 +2766,9 @@ namespace _3PA.NppCore {
         /// Represents a margin marker in a Scintilla control.
         /// </summary>
         public class Marker {
+
+            private Sci Sci;
+
             #region Constants
 
             /// <summary>
@@ -2843,12 +2829,12 @@ namespace _3PA.NppCore {
                 if (image == null)
                     return;
 
-                Api.Send(SciMsg.SCI_RGBAIMAGESETWIDTH, new IntPtr(image.Width));
-                Api.Send(SciMsg.SCI_RGBAIMAGESETHEIGHT, new IntPtr(image.Height));
+                Sci.Api.Send(SciMsg.SCI_RGBAIMAGESETWIDTH, new IntPtr(image.Width));
+                Sci.Api.Send(SciMsg.SCI_RGBAIMAGESETHEIGHT, new IntPtr(image.Height));
 
                 var bytes = BitmapToArgb(image);
                 fixed (byte* bp = bytes)
-                    Api.Send(SciMsg.SCI_MARKERDEFINERGBAIMAGE, new IntPtr(Index), new IntPtr(bp));
+                    Sci.Api.Send(SciMsg.SCI_MARKERDEFINERGBAIMAGE, new IntPtr(Index), new IntPtr(bp));
             }
 
             /// <summary>
@@ -2861,7 +2847,7 @@ namespace _3PA.NppCore {
             /// </remarks>
             public void SetAlpha(int alpha) {
                 alpha = Clamp(alpha, 0, 255);
-                Api.Send(SciMsg.SCI_MARKERSETALPHA, new IntPtr(Index), new IntPtr(alpha));
+                Sci.Api.Send(SciMsg.SCI_MARKERSETALPHA, new IntPtr(Index), new IntPtr(alpha));
             }
 
             /// <summary>
@@ -2875,7 +2861,7 @@ namespace _3PA.NppCore {
             /// </remarks>
             public void SetBackColor(Color color) {
                 var colour = ColorTranslator.ToWin32(color);
-                Api.Send(SciMsg.SCI_MARKERSETBACK, new IntPtr(Index), new IntPtr(colour));
+                Sci.Api.Send(SciMsg.SCI_MARKERSETBACK, new IntPtr(Index), new IntPtr(colour));
             }
 
             /// <summary>
@@ -2883,7 +2869,7 @@ namespace _3PA.NppCore {
             /// </summary>
             public void SetBackSelectedColor(Color color) {
                 var colour = ColorTranslator.ToWin32(color);
-                Api.Send(SciMsg.SCI_MARKERSETBACKSELECTED, new IntPtr(Index), new IntPtr(colour));
+                Sci.Api.Send(SciMsg.SCI_MARKERSETBACKSELECTED, new IntPtr(Index), new IntPtr(colour));
             }
 
             /// <summary>
@@ -2892,7 +2878,7 @@ namespace _3PA.NppCore {
             /// <param name="color">The Marker foreground Color. The default is Black.</param>
             public void SetForeColor(Color color) {
                 var colour = ColorTranslator.ToWin32(color);
-                Api.Send(SciMsg.SCI_MARKERSETFORE, new IntPtr(Index), new IntPtr(colour));
+                Sci.Api.Send(SciMsg.SCI_MARKERSETFORE, new IntPtr(Index), new IntPtr(colour));
             }
 
             /// <summary>
@@ -2909,10 +2895,10 @@ namespace _3PA.NppCore {
             /// The default is MarkerSymbol.Circle.
             /// </returns>
             public MarkerSymbol Symbol {
-                get { return (MarkerSymbol) Api.Send(SciMsg.SCI_MARKERSYMBOLDEFINED, new IntPtr(Index)); }
+                get { return (MarkerSymbol)Sci.Api.Send(SciMsg.SCI_MARKERSYMBOLDEFINED, new IntPtr(Index)); }
                 set {
                     var markerSymbol = (int) value;
-                    Api.Send(SciMsg.SCI_MARKERDEFINE, new IntPtr(Index), new IntPtr(markerSymbol));
+                    Sci.Api.Send(SciMsg.SCI_MARKERDEFINE, new IntPtr(Index), new IntPtr(markerSymbol));
                 }
             }
 
@@ -2926,24 +2912,25 @@ namespace _3PA.NppCore {
             /// Marker numbers 0 to 24 have no pre-defined function; you can use them to mark syntax errors and so on..
             /// </summary>
             /// <param name="index">The index of this style within the MarkerCollection that created it.</param>
-            public Marker(int index) {
+            public Marker(Sci scintilla, int index) {
+                Sci = scintilla;
                 Index = index;
             }
 
             #endregion
-
-            #region static
-
-            /// <summary>
-            /// Removes the specified marker from all lines.
-            /// </summary>
-            /// <param name="marker">The zero-based Marker index to remove from all lines, or -1 to remove all markers from all lines.</param>
-            public static void MarkerDeleteAll(int marker) {
-                Api.Send(SciMsg.SCI_MARKERDELETEALL, new IntPtr(marker));
-            }
-
-            #endregion
         }
+
+        #region static
+
+        /// <summary>
+        /// Removes the specified marker from all lines.
+        /// </summary>
+        /// <param name="marker">The zero-based Marker index to remove from all lines, or -1 to remove all markers from all lines.</param>
+        public void MarkerDeleteAll(int marker) {
+            Api.Send(SciMsg.SCI_MARKERDELETEALL, new IntPtr(marker));
+        }
+
+        #endregion
 
         #endregion
 
@@ -2953,11 +2940,14 @@ namespace _3PA.NppCore {
         /// Represents a margin displayed on the left edge of a Scintilla control.
         /// </summary>
         public class Margin {
+
+            private Sci Sci;
+
             /// <summary>
             /// Removes all text displayed in every MarginType.Text and MarginType.RightText margins.
             /// </summary>
             public void ClearAllText() {
-                Api.Send(SciMsg.SCI_MARGINTEXTCLEARALL);
+                Sci.Api.Send(SciMsg.SCI_MARGINTEXTCLEARALL);
             }
 
             /// <summary>
@@ -2965,10 +2955,10 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>One of the MarginCursor enumeration values. The default is MarginCursor.Arrow.</returns>
             public MarginCursor Cursor {
-                get { return (MarginCursor) Api.Send(SciMsg.SCI_GETMARGINCURSORN, new IntPtr(Index)); }
+                get { return (MarginCursor)Sci.Api.Send(SciMsg.SCI_GETMARGINCURSORN, new IntPtr(Index)); }
                 set {
                     var cursor = (int) value;
-                    Api.Send(SciMsg.SCI_SETMARGINCURSORN, new IntPtr(Index), new IntPtr(cursor));
+                    Sci.Api.Send(SciMsg.SCI_SETMARGINCURSORN, new IntPtr(Index), new IntPtr(cursor));
                 }
             }
 
@@ -2983,10 +2973,10 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>true if the margin is sensitive to mouse clicks; otherwise, false. The default is false.</returns>
             public bool Sensitive {
-                get { return Api.Send(SciMsg.SCI_GETMARGINSENSITIVEN, new IntPtr(Index)) != IntPtr.Zero; }
+                get { return Sci.Api.Send(SciMsg.SCI_GETMARGINSENSITIVEN, new IntPtr(Index)) != IntPtr.Zero; }
                 set {
                     var sensitive = value ? new IntPtr(1) : IntPtr.Zero;
-                    Api.Send(SciMsg.SCI_SETMARGINSENSITIVEN, new IntPtr(Index), sensitive);
+                    Sci.Api.Send(SciMsg.SCI_SETMARGINSENSITIVEN, new IntPtr(Index), sensitive);
                 }
             }
 
@@ -2995,10 +2985,10 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>One of the MarginType enumeration values. The default is MarginType.Symbol.</returns>
             public MarginType Type {
-                get { return (MarginType) Api.Send(SciMsg.SCI_GETMARGINTYPEN, new IntPtr(Index)); }
+                get { return (MarginType)Sci.Api.Send(SciMsg.SCI_GETMARGINTYPEN, new IntPtr(Index)); }
                 set {
                     var type = (int) value;
-                    Api.Send(SciMsg.SCI_SETMARGINTYPEN, new IntPtr(Index), new IntPtr(type));
+                    Sci.Api.Send(SciMsg.SCI_SETMARGINTYPEN, new IntPtr(Index), new IntPtr(type));
                 }
             }
 
@@ -3008,10 +2998,10 @@ namespace _3PA.NppCore {
             /// <returns>The width of the margin measured in pixels.</returns>
             /// <remarks>Scintilla assigns various default widths.</remarks>
             public int Width {
-                get { return Api.Send(SciMsg.SCI_GETMARGINWIDTHN, new IntPtr(Index)).ToInt32(); }
+                get { return Sci.Api.Send(SciMsg.SCI_GETMARGINWIDTHN, new IntPtr(Index)).ToInt32(); }
                 set {
                     value = ClampMin(value, 0);
-                    Win32Api.SendMessage(HandleScintilla, SciMsg.SCI_SETMARGINWIDTHN, Index, value);
+                    Win32Api.SendMessage(Sci.Handle, SciMsg.SCI_SETMARGINWIDTHN, Index, value);
                 }
             }
 
@@ -3027,10 +3017,10 @@ namespace _3PA.NppCore {
             /// Marker.MaskFolders is a useful constant for working with just folder margin indexes.
             /// </remarks>
             public uint Mask {
-                get { return unchecked((uint) Api.Send(SciMsg.SCI_GETMARGINMASKN, new IntPtr(Index)).ToInt32()); }
+                get { return unchecked((uint)Sci.Api.Send(SciMsg.SCI_GETMARGINMASKN, new IntPtr(Index)).ToInt32()); }
                 set {
                     var mask = unchecked((int) value);
-                    Api.Send(SciMsg.SCI_SETMARGINMASKN, new IntPtr(Index), new IntPtr(mask));
+                    Sci.Api.Send(SciMsg.SCI_SETMARGINMASKN, new IntPtr(Index), new IntPtr(mask));
                 }
             }
 
@@ -3038,8 +3028,9 @@ namespace _3PA.NppCore {
             /// Initializes a new instance of the Margin class.
             /// </summary>
             /// <param name="index">The index of this margin within the MarginCollection that created it.</param>
-            public Margin(int index) {
+            public Margin(Sci scintilla, int index) {
                 Index = index;
+                Sci = scintilla;
             }
         }
 
@@ -3051,6 +3042,9 @@ namespace _3PA.NppCore {
         /// Represents an indicator in a Scintilla control.
         /// </summary>
         public class Indicator {
+
+            private Sci Sci;
+
             #region Constants
 
             /// <summary>
@@ -3081,10 +3075,10 @@ namespace _3PA.NppCore {
             /// indicator is not in use anywhere within the document the return value will be 0.
             /// </remarks>
             public int End(int position) {
-                position = Clamp(position, 0, TextLength);
-                position = Lines.CharToBytePosition(position);
-                position = Api.Send(SciMsg.SCI_INDICATOREND, new IntPtr(Index), new IntPtr(position)).ToInt32();
-                return Lines.ByteToCharPosition(position);
+                position = Clamp(position, 0, Sci.TextLength);
+                position = Sci.Lines.CharToBytePosition(position);
+                position = Sci.Api.Send(SciMsg.SCI_INDICATOREND, new IntPtr(Index), new IntPtr(position)).ToInt32();
+                return Sci.Lines.ByteToCharPosition(position);
             }
 
             /// <summary>
@@ -3099,10 +3093,10 @@ namespace _3PA.NppCore {
             /// indicator is not in use anywhere within the document the return value will be 0.
             /// </remarks>
             public int Start(int position) {
-                position = Clamp(position, 0, TextLength);
-                position = Lines.CharToBytePosition(position);
-                position = Api.Send(SciMsg.SCI_INDICATORSTART, new IntPtr(Index), new IntPtr(position)).ToInt32();
-                return Lines.ByteToCharPosition(position);
+                position = Clamp(position, 0, Sci.TextLength);
+                position = Sci.Lines.CharToBytePosition(position);
+                position = Sci.Api.Send(SciMsg.SCI_INDICATORSTART, new IntPtr(Index), new IntPtr(position)).ToInt32();
+                return Sci.Lines.ByteToCharPosition(position);
             }
 
             /// <summary>
@@ -3111,9 +3105,9 @@ namespace _3PA.NppCore {
             /// <param name="position">The zero-based document position to get the indicator value for.</param>
             /// <returns>The user-defined value at the specified <paramref name="position" />.</returns>
             public int ValueAt(int position) {
-                position = Clamp(position, 0, TextLength);
-                position = Lines.CharToBytePosition(position);
-                return Api.Send(SciMsg.SCI_INDICATORVALUEAT, new IntPtr(Index), new IntPtr(position)).ToInt32();
+                position = Clamp(position, 0, Sci.TextLength);
+                position = Sci.Lines.CharToBytePosition(position);
+                return Sci.Api.Send(SciMsg.SCI_INDICATORVALUEAT, new IntPtr(Index), new IntPtr(position)).ToInt32();
             }
 
             /// <summary>
@@ -3122,8 +3116,8 @@ namespace _3PA.NppCore {
             /// <param name="start"></param>
             /// <param name="end"></param>
             public void Add(int start, int end) {
-                IndicatorCurrent = Index;
-                IndicatorFillRange(start, end - start);
+                Sci.IndicatorCurrent = Index;
+                Sci.IndicatorFillRange(start, end - start);
             }
 
             /// <summary>
@@ -3132,8 +3126,8 @@ namespace _3PA.NppCore {
             /// <param name="start"></param>
             /// <param name="end"></param>
             public void Clear(int start, int end) {
-                IndicatorCurrent = Index;
-                IndicatorClearRange(start, end - start);
+                Sci.IndicatorCurrent = Index;
+                Sci.IndicatorClearRange(start, end - start);
             }
 
             /// <summary>
@@ -3158,7 +3152,7 @@ namespace _3PA.NppCore {
             /// <param name="pos"></param>
             /// <returns></returns>
             public bool DefinedAt(int pos) {
-                return ((int) IndicatorAllOnFor(pos)).IsBitSet(Index);
+                return ((int)Sci.IndicatorAllOnFor(pos)).IsBitSet(Index);
             }
 
             #endregion Methods
@@ -3174,10 +3168,10 @@ namespace _3PA.NppCore {
             /// to 255 (no transparency). The default is 30.
             /// </returns>
             public int Alpha {
-                get { return Api.Send(SciMsg.SCI_INDICGETALPHA, new IntPtr(Index)).ToInt32(); }
+                get { return Sci.Api.Send(SciMsg.SCI_INDICGETALPHA, new IntPtr(Index)).ToInt32(); }
                 set {
                     value = Clamp(value, 0, 255);
-                    Api.Send(SciMsg.SCI_INDICSETALPHA, new IntPtr(Index), new IntPtr(value));
+                    Sci.Api.Send(SciMsg.SCI_INDICSETALPHA, new IntPtr(Index), new IntPtr(value));
                 }
             }
 
@@ -3189,10 +3183,10 @@ namespace _3PA.NppCore {
             /// The default is IndicatorFlags.None.
             /// </returns>
             public IndicatorFlags Flags {
-                get { return (IndicatorFlags) Api.Send(SciMsg.SCI_INDICGETFLAGS, new IntPtr(Index)); }
+                get { return (IndicatorFlags)Sci.Api.Send(SciMsg.SCI_INDICGETFLAGS, new IntPtr(Index)); }
                 set {
                     var flags = (int) value;
-                    Api.Send(SciMsg.SCI_INDICSETFLAGS, new IntPtr(Index), new IntPtr(flags));
+                    Sci.Api.Send(SciMsg.SCI_INDICSETFLAGS, new IntPtr(Index), new IntPtr(flags));
                 }
             }
 
@@ -3203,12 +3197,12 @@ namespace _3PA.NppCore {
             /// <remarks>Changing the ForeColor property will reset the HoverForeColor.</remarks>
             public Color ForeColor {
                 get {
-                    var color = Api.Send(SciMsg.SCI_INDICGETFORE, new IntPtr(Index)).ToInt32();
+                    var color = Sci.Api.Send(SciMsg.SCI_INDICGETFORE, new IntPtr(Index)).ToInt32();
                     return ColorTranslator.FromWin32(color);
                 }
                 set {
                     var color = ColorTranslator.ToWin32(value);
-                    Api.Send(SciMsg.SCI_INDICSETFORE, new IntPtr(Index), new IntPtr(color));
+                    Sci.Api.Send(SciMsg.SCI_INDICSETFORE, new IntPtr(Index), new IntPtr(color));
                 }
             }
 
@@ -3222,12 +3216,12 @@ namespace _3PA.NppCore {
             /// <remarks>Changing the ForeColor property will reset the HoverForeColor.</remarks>
             public Color HoverForeColor {
                 get {
-                    var color = Api.Send(SciMsg.SCI_INDICGETHOVERFORE, new IntPtr(Index)).ToInt32();
+                    var color = Sci.Api.Send(SciMsg.SCI_INDICGETHOVERFORE, new IntPtr(Index)).ToInt32();
                     return ColorTranslator.FromWin32(color);
                 }
                 set {
                     var color = ColorTranslator.ToWin32(value);
-                    Api.Send(SciMsg.SCI_INDICSETHOVERFORE, new IntPtr(Index), new IntPtr(color));
+                    Sci.Api.Send(SciMsg.SCI_INDICSETHOVERFORE, new IntPtr(Index), new IntPtr(color));
                 }
             }
 
@@ -3240,10 +3234,10 @@ namespace _3PA.NppCore {
             /// </returns>
             /// <remarks>Changing the Style property will reset the HoverStyle.</remarks>
             public IndicatorStyle HoverStyle {
-                get { return (IndicatorStyle) Api.Send(SciMsg.SCI_INDICGETHOVERSTYLE, new IntPtr(Index)); }
+                get { return (IndicatorStyle)Sci.Api.Send(SciMsg.SCI_INDICGETHOVERSTYLE, new IntPtr(Index)); }
                 set {
                     var style = (int) value;
-                    Api.Send(SciMsg.SCI_INDICSETHOVERSTYLE, new IntPtr(Index), new IntPtr(style));
+                    Sci.Api.Send(SciMsg.SCI_INDICSETHOVERSTYLE, new IntPtr(Index), new IntPtr(style));
                 }
             }
 
@@ -3262,10 +3256,10 @@ namespace _3PA.NppCore {
             /// to 255 (no transparency). The default is 50.
             /// </returns>
             public int OutlineAlpha {
-                get { return Api.Send(SciMsg.SCI_INDICGETOUTLINEALPHA, new IntPtr(Index)).ToInt32(); }
+                get { return Sci.Api.Send(SciMsg.SCI_INDICGETOUTLINEALPHA, new IntPtr(Index)).ToInt32(); }
                 set {
                     value = Clamp(value, 0, 255);
-                    Api.Send(SciMsg.SCI_INDICSETOUTLINEALPHA, new IntPtr(Index), new IntPtr(value));
+                    Sci.Api.Send(SciMsg.SCI_INDICSETOUTLINEALPHA, new IntPtr(Index), new IntPtr(value));
                 }
             }
 
@@ -3275,10 +3269,10 @@ namespace _3PA.NppCore {
             /// <returns>One of the IndicatorStyle enumeration values. The default varies.</returns>
             /// <remarks>Changing the Style property will reset the HoverStyle.</remarks>
             public IndicatorStyle Style {
-                get { return (IndicatorStyle) Api.Send(SciMsg.SCI_INDICGETSTYLE, new IntPtr(Index)); }
+                get { return (IndicatorStyle)Sci.Api.Send(SciMsg.SCI_INDICGETSTYLE, new IntPtr(Index)); }
                 set {
                     var style = (int) value;
-                    Api.Send(SciMsg.SCI_INDICSETSTYLE, new IntPtr(Index), new IntPtr(style));
+                    Sci.Api.Send(SciMsg.SCI_INDICSETSTYLE, new IntPtr(Index), new IntPtr(style));
                 }
             }
 
@@ -3288,10 +3282,10 @@ namespace _3PA.NppCore {
             /// <returns>true to draw the indicator under text; otherwise, false. The default is false.</returns>
             /// <remarks>Drawing indicators under text requires Phases.One or Phases.Multiple drawing.</remarks>
             public bool Under {
-                get { return Api.Send(SciMsg.SCI_INDICGETUNDER, new IntPtr(Index)) != IntPtr.Zero; }
+                get { return Sci.Api.Send(SciMsg.SCI_INDICGETUNDER, new IntPtr(Index)) != IntPtr.Zero; }
                 set {
                     var under = value ? new IntPtr(1) : IntPtr.Zero;
-                    Api.Send(SciMsg.SCI_INDICSETUNDER, new IntPtr(Index), under);
+                    Sci.Api.Send(SciMsg.SCI_INDICSETUNDER, new IntPtr(Index), under);
                 }
             }
 
@@ -3303,85 +3297,87 @@ namespace _3PA.NppCore {
             /// Initializes a new instance of the Indicator class.
             /// </summary>
             /// <param name="index">The index of this style within the IndicatorCollection that created it.</param>
-            public Indicator(int index) {
+            public Indicator(Sci scintilla, int index) {
+                Sci = scintilla;
                 Index = index;
             }
 
             #endregion Constructors
 
-            #region Static
-
-            /// <summary>
-            /// Gets or sets the indicator used in a subsequent call to IndicatorFillRange or IndicatorClearRange.
-            /// </summary>
-            /// <returns>
-            /// The zero-based indicator index to apply when calling IndicatorFillRange or remove when calling
-            /// IndicatorClearRange.
-            /// </returns>
-            public static int IndicatorCurrent {
-                get { return Api.Send(SciMsg.SCI_GETINDICATORCURRENT).ToInt32(); }
-                set {
-                    value = Clamp(value, 0, 31);
-                    Api.Send(SciMsg.SCI_SETINDICATORCURRENT, new IntPtr(value));
-                }
-            }
-
-            /// <summary>
-            /// Gets or sets the user-defined value used in a subsequent call to IndicatorFillRange.
-            /// </summary>
-            /// <returns>The indicator value to apply when calling IndicatorFillRange.</returns>
-            public static int IndicatorValue {
-                get { return Api.Send(SciMsg.SCI_GETINDICATORVALUE).ToInt32(); }
-                set { Api.Send(SciMsg.SCI_SETINDICATORVALUE, new IntPtr(value)); }
-            }
-
-            /// <summary>
-            /// Returns a bitmap representing the 32 indicators in use at the specified position.
-            /// </summary>
-            /// <param name="position">The zero-based character position within the document to test.</param>
-            /// <returns>A bitmap indicating which of the 32 indicators are in use at the specified <paramref name="position" />.</returns>
-            public static uint IndicatorAllOnFor(int position) {
-                position = Clamp(position, 0, TextLength);
-                position = Lines.CharToBytePosition(position);
-
-                var bitmap = Api.Send(SciMsg.SCI_INDICATORALLONFOR, new IntPtr(position)).ToInt32();
-                return unchecked((uint) bitmap);
-            }
-
-            /// <summary>
-            /// Removes the IndicatorCurrent indicator (and user-defined value) from the specified range of text.
-            /// </summary>
-            /// <param name="position">The zero-based character position within the document to start clearing.</param>
-            /// <param name="length">The number of characters to clear.</param>
-            public static void IndicatorClearRange(int position, int length) {
-                var textLength = TextLength;
-                position = Clamp(position, 0, textLength);
-                length = Clamp(length, 0, textLength - position);
-
-                var startPos = Lines.CharToBytePosition(position);
-                var endPos = Lines.CharToBytePosition(position + length);
-
-                Api.Send(SciMsg.SCI_INDICATORCLEARRANGE, new IntPtr(startPos), new IntPtr(endPos - startPos));
-            }
-
-            /// <summary>
-            /// Adds the IndicatorCurrent indicator and IndicatorValue value to the specified range of text.
-            /// </summary>
-            /// <param name="position">The zero-based character position within the document to start filling.</param>
-            /// <param name="length">The number of characters to fill.</param>
-            public static void IndicatorFillRange(int position, int length) {
-                var textLength = TextLength;
-                position = Clamp(position, 0, textLength);
-                length = Clamp(length, 0, textLength - position);
-
-                var startPos = Lines.CharToBytePosition(position);
-                var endPos = Lines.CharToBytePosition(position + length);
-
-                Api.Send(SciMsg.SCI_INDICATORFILLRANGE, new IntPtr(startPos), new IntPtr(endPos - startPos));
-            }
-
-            #endregion
         }
+        
+        #region Static
+
+        /// <summary>
+        /// Gets or sets the indicator used in a subsequent call to IndicatorFillRange or IndicatorClearRange.
+        /// </summary>
+        /// <returns>
+        /// The zero-based indicator index to apply when calling IndicatorFillRange or remove when calling
+        /// IndicatorClearRange.
+        /// </returns>
+        public int IndicatorCurrent {
+            get { return Api.Send(SciMsg.SCI_GETINDICATORCURRENT).ToInt32(); }
+            set {
+                value = Clamp(value, 0, 31);
+                Api.Send(SciMsg.SCI_SETINDICATORCURRENT, new IntPtr(value));
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the user-defined value used in a subsequent call to IndicatorFillRange.
+        /// </summary>
+        /// <returns>The indicator value to apply when calling IndicatorFillRange.</returns>
+        public int IndicatorValue {
+            get { return Api.Send(SciMsg.SCI_GETINDICATORVALUE).ToInt32(); }
+            set { Api.Send(SciMsg.SCI_SETINDICATORVALUE, new IntPtr(value)); }
+        }
+
+        /// <summary>
+        /// Returns a bitmap representing the 32 indicators in use at the specified position.
+        /// </summary>
+        /// <param name="position">The zero-based character position within the document to test.</param>
+        /// <returns>A bitmap indicating which of the 32 indicators are in use at the specified <paramref name="position" />.</returns>
+        public uint IndicatorAllOnFor(int position) {
+            position = Clamp(position, 0, TextLength);
+            position = Lines.CharToBytePosition(position);
+
+            var bitmap = Api.Send(SciMsg.SCI_INDICATORALLONFOR, new IntPtr(position)).ToInt32();
+            return unchecked((uint)bitmap);
+        }
+
+        /// <summary>
+        /// Removes the IndicatorCurrent indicator (and user-defined value) from the specified range of text.
+        /// </summary>
+        /// <param name="position">The zero-based character position within the document to start clearing.</param>
+        /// <param name="length">The number of characters to clear.</param>
+        public void IndicatorClearRange(int position, int length) {
+            var textLength = TextLength;
+            position = Clamp(position, 0, textLength);
+            length = Clamp(length, 0, textLength - position);
+
+            var startPos = Lines.CharToBytePosition(position);
+            var endPos = Lines.CharToBytePosition(position + length);
+
+            Api.Send(SciMsg.SCI_INDICATORCLEARRANGE, new IntPtr(startPos), new IntPtr(endPos - startPos));
+        }
+
+        /// <summary>
+        /// Adds the IndicatorCurrent indicator and IndicatorValue value to the specified range of text.
+        /// </summary>
+        /// <param name="position">The zero-based character position within the document to start filling.</param>
+        /// <param name="length">The number of characters to fill.</param>
+        public void IndicatorFillRange(int position, int length) {
+            var textLength = TextLength;
+            position = Clamp(position, 0, textLength);
+            length = Clamp(length, 0, textLength - position);
+
+            var startPos = Lines.CharToBytePosition(position);
+            var endPos = Lines.CharToBytePosition(position + length);
+
+            Api.Send(SciMsg.SCI_INDICATORFILLRANGE, new IntPtr(startPos), new IntPtr(endPos - startPos));
+        }
+
+        #endregion
 
         #endregion
 
@@ -3391,6 +3387,9 @@ namespace _3PA.NppCore {
         /// A style definition in a Scintilla control.
         /// </summary>
         public class Style {
+
+            private Sci Sci;
+
             #region Constants
 
             /// <summary>
@@ -3442,7 +3441,7 @@ namespace _3PA.NppCore {
             /// <remarks>Alpha color values are ignored.</remarks>
             public Color BackColor {
                 get {
-                    var color = Api.Send(SciMsg.SCI_STYLEGETBACK, new IntPtr(Index), IntPtr.Zero).ToInt32();
+                    var color = Sci.Api.Send(SciMsg.SCI_STYLEGETBACK, new IntPtr(Index), IntPtr.Zero).ToInt32();
                     return ColorTranslator.FromWin32(color);
                 }
                 set {
@@ -3450,7 +3449,7 @@ namespace _3PA.NppCore {
                         value = Color.White;
 
                     var color = ColorTranslator.ToWin32(value);
-                    Api.Send(SciMsg.SCI_STYLESETBACK, new IntPtr(Index), new IntPtr(color));
+                    Sci.Api.Send(SciMsg.SCI_STYLESETBACK, new IntPtr(Index), new IntPtr(color));
                 }
             }
 
@@ -3460,10 +3459,10 @@ namespace _3PA.NppCore {
             /// <returns>true if bold; otherwise, false. The default is false.</returns>
             /// <remarks>Setting this property affects the Weight property.</remarks>
             public bool Bold {
-                get { return Api.Send(SciMsg.SCI_STYLEGETBOLD, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
+                get { return Sci.Api.Send(SciMsg.SCI_STYLEGETBOLD, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
                 set {
                     var bold = value ? new IntPtr(1) : IntPtr.Zero;
-                    Api.Send(SciMsg.SCI_STYLESETBOLD, new IntPtr(Index), bold);
+                    Sci.Api.Send(SciMsg.SCI_STYLESETBOLD, new IntPtr(Index), bold);
                 }
             }
 
@@ -3474,13 +3473,13 @@ namespace _3PA.NppCore {
             /// <remarks>This does not affect how text is stored, only displayed.</remarks>
             public StyleCase Case {
                 get {
-                    var @case = Api.Send(SciMsg.SCI_STYLEGETCASE, new IntPtr(Index), IntPtr.Zero).ToInt32();
+                    var @case = Sci.Api.Send(SciMsg.SCI_STYLEGETCASE, new IntPtr(Index), IntPtr.Zero).ToInt32();
                     return (StyleCase) @case;
                 }
                 set {
                     // Just an excuse to use @... syntax
                     var @case = (int) value;
-                    Api.Send(SciMsg.SCI_STYLESETCASE, new IntPtr(Index), new IntPtr(@case));
+                    Sci.Api.Send(SciMsg.SCI_STYLESETCASE, new IntPtr(Index), new IntPtr(@case));
                 }
             }
 
@@ -3490,10 +3489,10 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>true to fill the line; otherwise, false. The default is false.</returns>
             public bool FillLine {
-                get { return Api.Send(SciMsg.SCI_STYLEGETEOLFILLED, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
+                get { return Sci.Api.Send(SciMsg.SCI_STYLEGETEOLFILLED, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
                 set {
                     var fillLine = value ? new IntPtr(1) : IntPtr.Zero;
-                    Api.Send(SciMsg.SCI_STYLESETEOLFILLED, new IntPtr(Index), fillLine);
+                    Sci.Api.Send(SciMsg.SCI_STYLESETEOLFILLED, new IntPtr(Index), fillLine);
                 }
             }
 
@@ -3504,11 +3503,11 @@ namespace _3PA.NppCore {
             /// <remarks>Scintilla caches fonts by name so font names and casing should be consistent.</remarks>
             public string Font {
                 get {
-                    var length = Api.Send(SciMsg.SCI_STYLEGETFONT, new IntPtr(Index), IntPtr.Zero).ToInt32();
+                    var length = Sci.Api.Send(SciMsg.SCI_STYLEGETFONT, new IntPtr(Index), IntPtr.Zero).ToInt32();
                     var font = new byte[length];
                     unsafe {
                         fixed (byte* bp = font)
-                            Api.Send(SciMsg.SCI_STYLEGETFONT, new IntPtr(Index), new IntPtr(bp));
+                            Sci.Api.Send(SciMsg.SCI_STYLEGETFONT, new IntPtr(Index), new IntPtr(bp));
                     }
 
                     var name = Encoding.UTF8.GetString(font, 0, length);
@@ -3522,7 +3521,7 @@ namespace _3PA.NppCore {
                     var font = GetBytes(value, Encoding.UTF8, true);
                     unsafe {
                         fixed (byte* bp = font)
-                            Api.Send(SciMsg.SCI_STYLESETFONT, new IntPtr(Index), new IntPtr(bp));
+                            Sci.Api.Send(SciMsg.SCI_STYLESETFONT, new IntPtr(Index), new IntPtr(bp));
                     }
                 }
             }
@@ -3534,7 +3533,7 @@ namespace _3PA.NppCore {
             /// <remarks>Alpha color values are ignored.</remarks>
             public Color ForeColor {
                 get {
-                    var color = Api.Send(SciMsg.SCI_STYLEGETFORE, new IntPtr(Index), IntPtr.Zero).ToInt32();
+                    var color = Sci.Api.Send(SciMsg.SCI_STYLEGETFORE, new IntPtr(Index), IntPtr.Zero).ToInt32();
                     return ColorTranslator.FromWin32(color);
                 }
                 set {
@@ -3542,7 +3541,7 @@ namespace _3PA.NppCore {
                         value = Color.Black;
 
                     var color = ColorTranslator.ToWin32(value);
-                    Api.Send(SciMsg.SCI_STYLESETFORE, new IntPtr(Index), new IntPtr(color));
+                    Sci.Api.Send(SciMsg.SCI_STYLESETFORE, new IntPtr(Index), new IntPtr(color));
                 }
             }
 
@@ -3551,10 +3550,10 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>true to use hyperlink behavior; otherwise, false. The default is false.</returns>
             public bool Hotspot {
-                get { return Api.Send(SciMsg.SCI_STYLEGETHOTSPOT, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
+                get { return Sci.Api.Send(SciMsg.SCI_STYLEGETHOTSPOT, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
                 set {
                     var hotspot = value ? new IntPtr(1) : IntPtr.Zero;
-                    Api.Send(SciMsg.SCI_STYLESETHOTSPOT, new IntPtr(Index), hotspot);
+                    Sci.Api.Send(SciMsg.SCI_STYLESETHOTSPOT, new IntPtr(Index), hotspot);
                 }
             }
 
@@ -3569,10 +3568,10 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>true if italic; otherwise, false. The default is false.</returns>
             public bool Italic {
-                get { return Api.Send(SciMsg.SCI_STYLEGETITALIC, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
+                get { return Sci.Api.Send(SciMsg.SCI_STYLEGETITALIC, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
                 set {
                     var italic = value ? new IntPtr(1) : IntPtr.Zero;
-                    Api.Send(SciMsg.SCI_STYLESETITALIC, new IntPtr(Index), italic);
+                    Sci.Api.Send(SciMsg.SCI_STYLESETITALIC, new IntPtr(Index), italic);
                 }
             }
 
@@ -3581,8 +3580,8 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>The size of the style font as a whole number of points. The default is 8.</returns>
             public int Size {
-                get { return Api.Send(SciMsg.SCI_STYLEGETSIZE, new IntPtr(Index), IntPtr.Zero).ToInt32(); }
-                set { Api.Send(SciMsg.SCI_STYLESETSIZE, new IntPtr(Index), new IntPtr(value)); }
+                get { return Sci.Api.Send(SciMsg.SCI_STYLEGETSIZE, new IntPtr(Index), IntPtr.Zero).ToInt32(); }
+                set { Sci.Api.Send(SciMsg.SCI_STYLESETSIZE, new IntPtr(Index), new IntPtr(value)); }
             }
 
             /// <summary>
@@ -3591,12 +3590,12 @@ namespace _3PA.NppCore {
             /// <returns>The size of the style font in fractional number of points. The default is 8.</returns>
             public float SizeF {
                 get {
-                    var fraction = Api.Send(SciMsg.SCI_STYLEGETSIZEFRACTIONAL, new IntPtr(Index), IntPtr.Zero).ToInt32();
+                    var fraction = Sci.Api.Send(SciMsg.SCI_STYLEGETSIZEFRACTIONAL, new IntPtr(Index), IntPtr.Zero).ToInt32();
                     return (float) fraction/(int) SciMsg.SC_FONT_SIZE_MULTIPLIER;
                 }
                 set {
                     var fraction = (int) (value*(int) SciMsg.SC_FONT_SIZE_MULTIPLIER);
-                    Api.Send(SciMsg.SCI_STYLESETSIZEFRACTIONAL, new IntPtr(Index), new IntPtr(fraction));
+                    Sci.Api.Send(SciMsg.SCI_STYLESETSIZEFRACTIONAL, new IntPtr(Index), new IntPtr(fraction));
                 }
             }
 
@@ -3605,10 +3604,10 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>true if underlined; otherwise, false. The default is false.</returns>
             public bool Underline {
-                get { return Api.Send(SciMsg.SCI_STYLEGETUNDERLINE, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
+                get { return Sci.Api.Send(SciMsg.SCI_STYLEGETUNDERLINE, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
                 set {
                     var underline = value ? new IntPtr(1) : IntPtr.Zero;
-                    Api.Send(SciMsg.SCI_STYLESETUNDERLINE, new IntPtr(Index), underline);
+                    Sci.Api.Send(SciMsg.SCI_STYLESETUNDERLINE, new IntPtr(Index), underline);
                 }
             }
 
@@ -3617,10 +3616,10 @@ namespace _3PA.NppCore {
             /// </summary>
             /// <returns>true to display the style text; otherwise, false. The default is true.</returns>
             public bool Visible {
-                get { return Api.Send(SciMsg.SCI_STYLEGETVISIBLE, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
+                get { return Sci.Api.Send(SciMsg.SCI_STYLEGETVISIBLE, new IntPtr(Index), IntPtr.Zero) != IntPtr.Zero; }
                 set {
                     var visible = value ? new IntPtr(1) : IntPtr.Zero;
-                    Api.Send(SciMsg.SCI_STYLESETVISIBLE, new IntPtr(Index), visible);
+                    Sci.Api.Send(SciMsg.SCI_STYLESETVISIBLE, new IntPtr(Index), visible);
                 }
             }
 
@@ -3630,8 +3629,8 @@ namespace _3PA.NppCore {
             /// <returns>The font weight. The default is 400.</returns>
             /// <remarks>Setting this property affects the Bold property.</remarks>
             public int Weight {
-                get { return Api.Send(SciMsg.SCI_STYLEGETWEIGHT, new IntPtr(Index), IntPtr.Zero).ToInt32(); }
-                set { Api.Send(SciMsg.SCI_STYLESETWEIGHT, new IntPtr(Index), new IntPtr(value)); }
+                get { return Sci.Api.Send(SciMsg.SCI_STYLEGETWEIGHT, new IntPtr(Index), IntPtr.Zero).ToInt32(); }
+                set { Sci.Api.Send(SciMsg.SCI_STYLESETWEIGHT, new IntPtr(Index), new IntPtr(value)); }
             }
 
             #endregion Properties
@@ -3643,7 +3642,8 @@ namespace _3PA.NppCore {
             /// There are also some predefined numbered styles starting at 32
             /// </summary>
             /// <param name="index"></param>
-            public Style(byte index) {
+            public Style(Sci scintilla, byte index) {
+                Sci = scintilla;
                 Index = index;
             }
 
@@ -3657,7 +3657,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Returns scintilla's encoding
         /// </summary>
-        internal static Encoding Encoding {
+        internal Encoding Encoding {
             get {
                 // Should always be UTF-8 unless someone has done an end run around us
                 var codePage = (int) Api.Send(SciMsg.SCI_GETCODEPAGE);

@@ -20,7 +20,7 @@ namespace _3PA.NppCore {
         /// <summary>
         /// Instantiates the direct message function
         /// </summary>
-        public void UpdateScintillaDirectMessage(IntPtr scintillaHandle) {
+        private void UpdateScintillaDirectMessage(IntPtr scintillaHandle) {
             _scintillaHandle = scintillaHandle;
             var directFunctionPointer = Win32Api.SendMessage(_scintillaHandle, (uint)SciMsg.SCI_GETDIRECTFUNCTION, IntPtr.Zero, IntPtr.Zero);
             // Create a managed callback

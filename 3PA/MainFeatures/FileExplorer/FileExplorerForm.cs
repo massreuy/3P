@@ -367,7 +367,7 @@ namespace _3PA.MainFeatures.FileExplorer {
                 yamuiList.ForceAllToExpand();
             _isExpanded = !_isExpanded;
             filterbox.ExtraButtonsList[1].BackGrndImage = _isExpanded ? ImageResources.Collapse : ImageResources.Expand;
-            Sci.GrabFocus();
+            Npp.Editor.GrabFocus();
         }
 
         #endregion
@@ -446,15 +446,15 @@ namespace _3PA.MainFeatures.FileExplorer {
 
         private void BtClearAllErrorsOnButtonPressed(object sender, EventArgs buttonPressedEventArgs) {
             FilesInfo.ClearAllErrors(Npp.CurrentFile.Path);
-            Sci.GrabFocus();
+            Npp.Editor.GrabFocus();
         }
 
         private void BtNextErrorOnButtonPressed(object sender, EventArgs buttonPressedEventArgs) {
-            FilesInfo.GoToNextError(Sci.Line.CurrentLine + 1);
+            FilesInfo.GoToNextError(Npp.Editor.CurrentLine + 1);
         }
 
         private void BtPrevErrorOnButtonPressed(object sender, EventArgs buttonPressedEventArgs) {
-            FilesInfo.GoToPrevError(Sci.Line.CurrentLine - 1);
+            FilesInfo.GoToPrevError(Npp.Editor.CurrentLine - 1);
         }
 
         private void BtGetHelpOnButtonPressed(object sender, EventArgs buttonPressedEventArgs) {
@@ -462,7 +462,7 @@ namespace _3PA.MainFeatures.FileExplorer {
             btGetHelp.UseGreyScale = !Config.Instance.GlobalShowDetailedHelpForErrors;
             FilesInfo.ClearAnnotationsAndMarkers();
             FilesInfo.UpdateErrorsInScintilla();
-            Sci.GrabFocus();
+            Npp.Editor.GrabFocus();
         }
 
         private void BtStopExecutionOnButtonPressed(object sender, EventArgs eventArgs) {

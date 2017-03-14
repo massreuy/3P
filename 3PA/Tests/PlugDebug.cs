@@ -49,7 +49,7 @@ namespace _3PA.Tests {
         }
 
         public static void ParseCurrentFile() {
-            RunParserTests(Sci.Text);
+            RunParserTests(Npp.Editor.Text);
         }
 
         public static void ParseAllFiles() {

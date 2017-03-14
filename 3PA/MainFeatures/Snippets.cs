@@ -90,23 +90,23 @@ namespace _3PA.MainFeatures {
         public static bool TriggerCodeSnippetInsertion() {
             if (InsertionActive) return false; // do no insert a snippet within a snippet!
 
-            string token = Sci.GetKeyword(Sci.CurrentPosition);
-            var curPos = Sci.CurrentPosition;
+            string token = Npp.Editor.GetKeyword(Npp.Editor.CurrentPosition);
+            var curPos = Npp.Editor.CurrentPosition;
             Point tokenPoints = new Point(curPos - token.Length, curPos);
 
             if (Contains(token)) {
                 string replacement = GetTemplate(token);
 
                 if (replacement != null) {
-                    int line = Sci.Line.CurrentLine;
-                    int lineStartPos = Sci.GetLine(line).Position;
+                    int line = Npp.Editor.CurrentLine;
+                    int lineStartPos = Npp.Editor.GetLine(line).Position;
 
                     int horizontalOffset = tokenPoints.X - lineStartPos;
 
                     //relative selection in the replacement text
                     PrepareForIncertion(replacement, horizontalOffset, tokenPoints.X);
 
-                    var indic = Sci.GetIndicator(SnippetContext.IndicatorId);
+                    var indic = Npp.Editor.GetIndicator(SnippetContext.IndicatorId);
                     indic.Style = IndicatorStyle.Box;
                     indic.ForeColor = Color.Blue;
 
@@ -115,8 +115,8 @@ namespace _3PA.MainFeatures {
                     }
 
                     if (LocSnippetContext.CurrentParameter.HasValue) {
-                        Sci.SetSelection(LocSnippetContext.CurrentParameter.Value.X, LocSnippetContext.CurrentParameter.Value.Y);
-                        LocSnippetContext.CurrentParameterValue = Sci.GetTextBetween(LocSnippetContext.CurrentParameter.Value);
+                        Npp.Editor.SetSelection(LocSnippetContext.CurrentParameter.Value.X, LocSnippetContext.CurrentParameter.Value.Y);
+                        LocSnippetContext.CurrentParameterValue = Npp.Editor.GetTextBetween(LocSnippetContext.CurrentParameter.Value);
                     }
 
                     AutoCompletion.Cloak();
@@ -131,17 +131,17 @@ namespace _3PA.MainFeatures {
         }
 
         static public void ReplaceTextAtIndicator(string text, Point indicatorRange) {
-            Sci.SetTextByRange(indicatorRange.X, indicatorRange.Y, text);
+            Npp.Editor.SetTextByRange(indicatorRange.X, indicatorRange.Y, text);
 
             //restore the indicator
-            var indic = Sci.GetIndicator(SnippetContext.IndicatorId);
+            var indic = Npp.Editor.GetIndicator(SnippetContext.IndicatorId);
             indic.Style = IndicatorStyle.Box;
             indic.ForeColor = Color.Blue;
             indic.Add(indicatorRange.X, indicatorRange.X + text.Length);
         }
 
         static public bool NavigateToNextParam() {
-            var indic = Sci.GetIndicator(SnippetContext.IndicatorId);
+            var indic = Npp.Editor.GetIndicator(SnippetContext.IndicatorId);
             indic.Style = IndicatorStyle.Box;
             indic.ForeColor = Color.Blue;
 
@@ -154,8 +154,8 @@ namespace _3PA.MainFeatures {
                 Point currentParam = LocSnippetContext.CurrentParameter.Value;
                 string currentParamOriginalText = LocSnippetContext.CurrentParameterValue;
 
-                Sci.SetSelection(currentParam.X, currentParam.X);
-                string currentParamDetectedText = Sci.GetAblWordAtPosition(Sci.CurrentPosition);
+                Npp.Editor.SetSelection(currentParam.X, currentParam.X);
+                string currentParamDetectedText = Npp.Editor.GetAblWordAtPosition(Npp.Editor.CurrentPosition);
 
                 if (currentParamOriginalText != currentParamDetectedText) {
                     //current parameter is modified, indicator is destroyed so restore the indicator first
@@ -165,7 +165,7 @@ namespace _3PA.MainFeatures {
 
                     var paramsInfo = indicators.Select(p => new {
                         Index = indicators.IndexOf(p),
-                        Text = Sci.GetTextBetween(p),
+                        Text = Npp.Editor.GetTextBetween(p),
                         Range = p,
                         Pos = p.X
                     })
@@ -183,14 +183,14 @@ namespace _3PA.MainFeatures {
                 Point? nextParameter = null;
 
                 int currentParamIndex = indicators.FindIndex(x => x.X >= currentParam.X); //can also be logical 'next'
-                var prevParamsValues = indicators.Take(currentParamIndex).Select(p => Sci.GetTextBetween(p)).ToList();
+                var prevParamsValues = indicators.Take(currentParamIndex).Select(p => Npp.Editor.GetTextBetween(p)).ToList();
                 prevParamsValues.Add(currentParamOriginalText);
                 prevParamsValues.Add(currentParamDetectedText);
                 prevParamsValues.Add(" ");
                 prevParamsValues.Add("|");
 
                 foreach (var range in indicators.ToArray()) {
-                    if (currentParam.X < range.X && !prevParamsValues.Contains(Sci.GetTextBetween(range))) {
+                    if (currentParam.X < range.X && !prevParamsValues.Contains(Npp.Editor.GetTextBetween(range))) {
                         nextParameter = range;
                         break;
                     }
@@ -202,29 +202,29 @@ namespace _3PA.MainFeatures {
                 LocSnippetContext.CurrentParameter = nextParameter;
             }
             if (LocSnippetContext.CurrentParameter.HasValue) {
-                Sci.SetSelection(LocSnippetContext.CurrentParameter.Value.X, LocSnippetContext.CurrentParameter.Value.Y);
-                LocSnippetContext.CurrentParameterValue = Sci.GetTextBetween(LocSnippetContext.CurrentParameter.Value);
+                Npp.Editor.SetSelection(LocSnippetContext.CurrentParameter.Value.X, LocSnippetContext.CurrentParameter.Value.Y);
+                LocSnippetContext.CurrentParameterValue = Npp.Editor.GetTextBetween(LocSnippetContext.CurrentParameter.Value);
             }
 
             return true;
         }
 
         static public void FinalizeCurrent() {
-            var indic = Sci.GetIndicator(SnippetContext.IndicatorId);
+            var indic = Npp.Editor.GetIndicator(SnippetContext.IndicatorId);
             var indicators = indic.FindRanges().ToArray();
 
             foreach (var range in indicators)
                 indic.Clear(range.X, range.Y);
 
             var caretPoint = indicators.Where(point => {
-                string text = Sci.GetTextBetween(point);
+                string text = Npp.Editor.GetTextBetween(point);
                 return text == " " || text == "|";
             })
                 .FirstOrDefault();
 
             if (caretPoint.X != caretPoint.Y) {
-                Sci.SetTextByRange(caretPoint.X, caretPoint.Y, "");
-                Sci.SetSelection(caretPoint.X, caretPoint.X);
+                Npp.Editor.SetTextByRange(caretPoint.X, caretPoint.Y, "");
+                Npp.Editor.SetSelection(caretPoint.X, caretPoint.X);
             }
 
             LocSnippetContext = null;
@@ -263,7 +263,7 @@ namespace _3PA.MainFeatures {
                 startPos = LocSnippetContext.ReplacementString.IndexOf("$", endPos + 1, StringComparison.Ordinal);
             }
 
-            Sci.ReplaceKeywordWrapped(LocSnippetContext.ReplacementString, -1);
+            Npp.Editor.ReplaceKeywordWrapped(LocSnippetContext.ReplacementString, -1);
 
             if (LocSnippetContext.Parameters.Any())
                 LocSnippetContext.CurrentParameter = LocSnippetContext.Parameters.FirstOrDefault();

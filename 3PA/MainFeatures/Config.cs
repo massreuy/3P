@@ -36,6 +36,7 @@ namespace _3PA.MainFeatures {
     /// you should call it like this : Config.Instance.myparam
     /// </summary>
     internal static class Config {
+
         #region config Object
 
         /// <summary>

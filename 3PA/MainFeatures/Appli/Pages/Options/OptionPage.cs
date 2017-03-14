@@ -343,7 +343,7 @@ namespace _3PA.MainFeatures.Appli.Pages.Options {
             AutoCompletion.ForceClose();
             InfoToolTip.InfoToolTip.ForceClose();
             Plug.ApplyOptionsForScintilla();
-            Sci.MouseDwellTime = Config.Instance.ToolTipmsBeforeShowing;
+            Npp.Editor.MouseDwellTime = Config.Instance.ToolTipmsBeforeShowing;
             AutoCompletion.RefreshStaticItems(); // when changing case
         }
 
