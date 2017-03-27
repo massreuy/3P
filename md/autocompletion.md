@@ -24,7 +24,7 @@
 
 * if you configure a connection to a progress database, it provides the auto-completion on `TABLE` names as well as `FIELD` names. Enter `mydatabasename` followed by a dot `.` and a list of tables of this database will show up, a dot `.` after a table name will show up its fields (it also differentiates fields that are part of the primary key) :
 
-![image](content_images/autocompletion/85bdaccc-8d4c-11e5-9caa-6ff3a24d5b72.png)
+![image](content_images/gif/auto-comp_database.gif)
 
 > This also works with buffers so... use them!
 
@@ -34,7 +34,7 @@
 
 * When using the `UP` or `DOWN` arrow keys, you can navigate through the list. It also shows a tool-tip next to the auto-completion that provides more information on the keyword selected, this tool-tip can be used to understand the flags described in the above section!
 
-![image](content_images/autocompletion/70493fba-8d4b-11e5-9822-3089c62be2de.png)
+![image](content_images/gif/auto-comp_resize.gif)
 
 * Extra tips :
     - Thanks to the way keywords are sorted, you can find quick ways to type a word. For instance, the fastest way to type `ERROR-STATUS` can be typing `errsta` and pressing tab to accept the suggestion

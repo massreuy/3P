@@ -1,6 +1,6 @@
 # About this project #
 
-*<small>Last update of this page : 05/02/2017</small>*
+*<small>Last update of this page : 27/03/2017</small>*
 
 The **OpenEdge** **A**dvanced **B**usiness **L**anguage, or [OpenEdge ABL](https://www.progress.com/openedge) (formerly known as **Progress 4GL**) is a fourth-generation programming language which uses an English-like syntax. Applications developed with this language are portable across computing systems, it uses its own integrated relational database and programming tool which is called the "appbuilder".
 
@@ -34,13 +34,13 @@ The screenshot below gives you a quick overview of 3P's features :
 
 Access the main menu of 3P through the top bar icon or with the shortcut `CTRL+Right click` :
 
-![image](content_images/home/main_menu.png)
+![image](content_images/gif/main-menu.gif)
 
 ## Auto-completion ##
 
 A key feature of 3P is the built in auto-completion window. Fully integrated with notepad++, it smooths the developer work by suggesting the best match according to his intention :
 
-![image](content_images/home/autocompletion.png)
+![image](content_images/gif/auto-comp_demo.gif)
 
 *[Learn more about this feature here](#/autocompletion)*
 
@@ -62,7 +62,7 @@ The code explorer is your best friend when it comes to... exploring the code.
 
 It acts as an improved `function list`, well known to the notepad++ users. It displays the structure of the program and provides a quick way to jump from a code's portion to another (left click an item to get redirected to it) :
 
-![image](content_images/home/code_explorer.png)
+![image](content_images/gif/code-explorer.gif)
 
 *[Learn more about this feature here](#/code-explorer)*
 
